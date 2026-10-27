@@ -1,18 +1,24 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { listOffers } from "@/domains/offers/service";
 import { getProgram } from "@/domains/programs/service";
 import { ForbiddenError } from "@/lib/authorization";
 import { ValidationError } from "@/lib/errors";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { fmtDay } from "@/lib/format";
+import { Meters, ProgramMap } from "@/components/ProgramMap";
+import { ScheduleBadge, StageBar } from "@/components/StageBar";
+import { stageName } from "@/lib/stages";
+import { NewOfferForm } from "../../ofertas/forms";
 import { ProgramForm } from "./form";
 
 export default async function ProgramPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await requireUser();
   let data;
+  let offers;
   try {
-    data = await getProgram(toContext(user), id);
+    [data, offers] = await Promise.all([getProgram(toContext(user), id), listOffers(toContext(user), id)]);
   } catch (e) {
     if (e instanceof ForbiddenError || e instanceof ValidationError) notFound();
     throw e;
@@ -34,8 +40,45 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
       </div>
 
       <div className="card">
+        <h2 className="h2">Mapa das receitas</h2>
+        <p className="sub">Cada oferta na coluna do seu estágio; receitas sem oferta aparecem como lacuna. Meta de abril: 9 estruturadas, 4–5 validadas, 2–3 em escala.</p>
+        <Meters sources={sources} offers={offers} />
+        <ProgramMap sources={sources} levels={levels} offers={offers} />
+      </div>
+
+      <div className="card">
+        <h2 className="h2">Ofertas ({offers.length})</h2>
+        {offers.length === 0 ? (
+          <p className="empty">Nenhuma oferta ainda.{canEdit ? " Crie a primeira abaixo." : ""}</p>
+        ) : (
+          <table>
+            <thead><tr><th>Oferta</th><th>Receita</th><th style={{ width: 180 }}>Ciclo</th><th>Estágio</th><th>Meta / prazo</th><th>Vendas</th></tr></thead>
+            <tbody>
+              {offers.map((o) => (
+                <tr key={o.id} style={o.status !== "ativa" ? { opacity: 0.6 } : undefined}>
+                  <td><Link href={`/app/ofertas/${o.id}`}>{o.name}</Link>{o.status !== "ativa" && <> <span className="badge muted">{o.status}</span></>}</td>
+                  <td>{sources.find((x) => x.slug === o.revenueSlug)?.name ?? o.revenueSlug}</td>
+                  <td><StageBar stage={o.stage} compact /></td>
+                  <td>{o.stage}. {stageName(o.stage)}</td>
+                  <td>{stageName(o.targetStage)}{o.dueDate ? ` · ${fmtDay(o.dueDate)}` : ""} <ScheduleBadge status={o.schedule} /></td>
+                  <td>{o.salesCount}{o.pendingChecks > 0 && <> <span className="badge" title="itens aguardando confirmação">⏳ {o.pendingChecks}</span></>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {canEdit && (
+        <div className="card">
+          <h2 className="h2">Nova oferta</h2>
+          <NewOfferForm programId={program.id} sources={sources.map((x) => ({ slug: x.slug, name: x.name, level: x.level }))} />
+        </div>
+      )}
+
+      <div className="card">
         <h2 className="h2">Escala do Negócio</h2>
-        <p className="sub">Do topo (menor volume, maior ticket) à base (maior volume, menor ticket). Ofertas entram nos próximos módulos.</p>
+        <p className="sub">Do topo (menor volume, maior ticket) à base (maior volume, menor ticket).</p>
         <table>
           <thead><tr><th>Nível</th><th>Volume</th><th>Ticket</th><th>Esforço</th><th>Papel</th><th>Receitas</th></tr></thead>
           <tbody>

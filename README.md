@@ -18,12 +18,16 @@ npm run typecheck
 Sem `DATABASE_URL` o app usa PGlite em `.data/pglite`. Migrations em `db/migrations/*.sql` são aplicadas ao conectar.
 Primeiro administrador em produção: `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` + `npm run admin:create`.
 
-## Estado (Sprint 1, passo 1)
+## Estado (Sprint 1, passos 1 e 2)
 
 Pronto: login e troca obrigatória de senha, papéis (admin · direção · mentor · mentorado), mentorados (com/sem acesso),
 atribuição de mentores, templates (base IDL: 9 fontes de receita + Escala do Negócio, derivação por segmento/modelo),
-programas com **snapshot** do template, edição do programa, auditoria, menu lateral.
-Próximo: ofertas com os 7 estágios e portões, Caixa de ferramentas, Score de Alavancagem, liberação por ferramenta-chave.
+programas com **snapshot** do template, auditoria, menu lateral.
+**Ofertas:** ciclo de 7 estágios (Ideia → Prototipada → Oferta pronta → Em prospecção → Primeira venda → Validada → Escala)
+derivado de **portões editáveis** por template e por programa; marcação com evidência (mentorado marca como pendente, equipe confirma);
+vendas com origem (estágio 5+ só com venda registrada); prazo (cumprida / no prazo / em risco / atrasada);
+mapa das receitas × estágios e medidores da meta.
+Próximo: edição de templates/portões pela interface, Caixa de ferramentas, Score de Alavancagem, liberação por ferramenta-chave, check-in e KPIs semanais.
 
 ## Regras
 

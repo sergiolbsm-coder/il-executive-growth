@@ -19,7 +19,7 @@ export const NAV: NavItem[] = [
   { label: "Score de Alavancagem", icon: "🚀", href: "/app/score", roles: all, status: "soon" },
   { label: "Mentorados", icon: "👥", href: "/app/mentorados", roles: staff, status: "ready" },
   { label: "Meu plano", icon: "🧭", href: "/app/mentorados", roles: ["mentorado"], status: "ready" },
-  { label: "Ofertas", icon: "🧩", href: "/app/ofertas", roles: all, status: "soon" },
+  { label: "Ofertas", icon: "🧩", href: "/app/ofertas", roles: all, status: "ready" },
   { label: "Escala do Negócio", icon: "🔺", href: "/app/escala", roles: all, status: "soon" },
   { label: "Cadência", icon: "🗓️", href: "/app/cadencia", roles: all, status: "soon" },
   { label: "Comercial", icon: "💼", href: "/app/comercial", roles: all, status: "soon" },

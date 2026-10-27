@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { audit } from "@/lib/audit";
 import { type AuthContext, ForbiddenError, canDeleteRecords, canEditProgram, canViewMentee } from "@/lib/authorization";
 import { getDb, schema } from "@/lib/db";
@@ -94,7 +94,10 @@ export async function getOffer(actor: AuthContext, offerId: string) {
     db.select({ id: schema.offers.id, name: schema.offers.name }).from(schema.offers).where(eq(schema.offers.programId, program.id)).orderBy(asc(schema.offers.name)),
   ]);
   const view = derive(offer, gates, checks, sales.length, todayBR());
-  return { offer: view, program, mentee, gates, checks, sales, siblings, canEdit: canEditProgram(actor, toRef(mentee)) };
+  const ids = [...new Set([...checks.flatMap((c) => [c.checkedBy, c.confirmedBy]), ...sales.map((s) => s.createdBy)].filter((x): x is string => !!x))];
+  const people: Record<string, string> = {};
+  if (ids.length) for (const u of await db.select({ id: schema.users.id, name: schema.users.name }).from(schema.users).where(inArray(schema.users.id, ids))) people[u.id] = u.name;
+  return { offer: view, program, mentee, gates, checks, sales, siblings, people, canEdit: canEditProgram(actor, toRef(mentee)) };
 }
 
 export interface NewOffer {

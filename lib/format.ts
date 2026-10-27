@@ -22,3 +22,20 @@ export function fmtHours(h: number | null): string {
   if (h < 48) return `${h.toFixed(1).replace(".", ",")} h`;
   return `${(h / 24).toFixed(1).replace(".", ",")} dias`;
 }
+
+/** Centavos → "R$ 2.500,00". */
+export const fmtBRL = (cents: number) => (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+/**
+ * Texto digitado pelo usuário → centavos. Aceita "2500", "2.500,00", "2500,5", "R$ 2.500", "2500.50".
+ * Devolve null se não for um valor válido.
+ */
+export function parseBRLToCents(input: string): number | null {
+  let s = input.replace(/R\$|\s/g, "");
+  if (!s || !/^[\d.,]+$/.test(s)) return null;
+  if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ""); // 2.500 = dois mil e quinhentos
+  const n = Number(s);
+  if (!Number.isFinite(n) || n < 0 || !/^\d+(\.\d{1,2})?$/.test(s)) return null;
+  return Math.round(n * 100);
+}

@@ -63,6 +63,18 @@ async function main() {
   assert.throws(() => cleanGatePatch({ threshold: 2 }, "manual"), /Só portões de vendas/);
   ok("validação de portões (novos e edição)");
 
+  const { parseBRLToCents, fmtBRL } = await import("../lib/format");
+  assert.equal(parseBRLToCents("2500"), 250000);
+  assert.equal(parseBRLToCents("2.500,00"), 250000);
+  assert.equal(parseBRLToCents("R$ 2.500"), 250000);
+  assert.equal(parseBRLToCents("2500,5"), 250050);
+  assert.equal(parseBRLToCents("2500.50"), 250050);
+  assert.equal(parseBRLToCents("0,99"), 99);
+  assert.equal(parseBRLToCents("1.234.567,89"), 123456789);
+  for (const bad of ["", "abc", "12,345", "1,2,3", "-5", "R$"]) assert.equal(parseBRLToCents(bad), null, `inválido: ${bad}`);
+  assert.match(fmtBRL(250000), /2\.500,00/);
+  ok("valores em reais: parser e formatação");
+
   // ── Com banco ─────────────────────────────────────────────────────────
   const { getDb, schema, closeDb } = await import("../lib/db");
   const { createUser } = await import("../domains/users/service");
