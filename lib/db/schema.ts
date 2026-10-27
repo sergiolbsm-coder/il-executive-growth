@@ -437,3 +437,57 @@ export const scoreSnapshots = pgTable(
   },
   (t) => [unique().on(t.programId, t.weekStart)],
 );
+
+export const contentAxes = pgTable(
+  "content_axes",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    programId: uuid("program_id").notNull().references(() => programs.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    sort: integer("sort").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [unique().on(t.programId, t.name)],
+);
+
+export const contentItems = pgTable(
+  "content_items",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    programId: uuid("program_id").notNull().references(() => programs.id, { onDelete: "cascade" }),
+    axisId: uuid("axis_id").references(() => contentAxes.id, { onDelete: "set null" }),
+    offerId: uuid("offer_id").references(() => offers.id, { onDelete: "set null" }),
+    weekStart: date("week_start").notNull(),
+    channel: text("channel").notNull(),
+    title: text("title").notNull(),
+    thesis: text("thesis"),
+    status: text("status").$type<"ideia" | "rascunho" | "agendada" | "publicada" | "descartada">().notNull().default("ideia"),
+    publishUrl: text("publish_url"),
+    publishedOn: date("published_on"),
+    engagement: integer("engagement"),
+    leads: integer("leads"),
+    createdBy: uuid("created_by").references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("content_items_program_week_idx").on(t.programId, t.weekStart)],
+);
+
+export const libraryLinks = pgTable(
+  "library_links",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    programId: uuid("program_id").notNull().references(() => programs.id, { onDelete: "cascade" }),
+    kind: text("kind").$type<"drive-arquivo" | "drive-pasta" | "link">().notNull(),
+    title: text("title").notNull(),
+    url: text("url").notNull(),
+    category: text("category"),
+    description: text("description"),
+    pinned: boolean("pinned").notNull().default(false),
+    createdBy: uuid("created_by").references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("library_links_program_idx").on(t.programId)],
+);
