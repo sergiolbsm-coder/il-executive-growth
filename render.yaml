@@ -5,7 +5,8 @@ services:
     runtime: node
     plan: free          # free hiberna sem acessos; avaliar plano pago para uso diário
     region: virginia    # mais próxima do Brasil entre as regiões do Render (o Neon está em sa-east-1)
-    buildCommand: npm ci && npm run build
+    # --include=dev: com NODE_ENV=production o npm ci pula typescript/@types, e o next build precisa deles
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /login
     envVars:
