@@ -71,6 +71,12 @@ export async function deriveTemplate(
       await tx.insert(schema.templateGates).values(
         src.gates.map((g) => ({ templateId: t.id, stage: g.stage, key: g.key, label: g.label, kind: g.kind, threshold: g.threshold, required: g.required, sort: g.sort })),
       );
+    const kpis = await tx.select().from(schema.templateKpis).where(eq(schema.templateKpis.templateId, src.template.id));
+    if (kpis.length)
+      await tx.insert(schema.templateKpis).values(kpis.map((k) => ({ templateId: t.id, key: k.key, label: k.label, grp: k.grp, weeklyTarget: k.weeklyTarget, sort: k.sort })));
+    const tls = await tx.select().from(schema.templateTools).where(eq(schema.templateTools.templateId, src.template.id));
+    if (tls.length) await tx.insert(schema.templateTools).values(tls.map((x) => ({ templateId: t.id, toolSlug: x.toolSlug })));
+    if (src.template.scoreWeights) await tx.update(schema.programTemplates).set({ scoreWeights: src.template.scoreWeights }).where(eq(schema.programTemplates.id, t.id));
     return t;
   });
   await audit({ actorId: actor.userId, entityType: "template", entityId: created.id, action: "template.derive", after: { from: fromId, name, segment, model } });

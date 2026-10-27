@@ -51,7 +51,7 @@ export async function createProgram(
         menteeId: input.menteeId, templateId: t.template.id, templateVersion: t.template.version, name,
         model: input.model?.trim() || t.template.model, purpose: input.purpose?.trim() || null,
         weeklyHours: input.weeklyHours ?? null, startDate: input.startDate || null, endDate: input.endDate || null,
-        createdBy: actor.userId,
+        scoreWeights: t.template.scoreWeights, createdBy: actor.userId,
       })
       .returning();
     if (t.sources.length)
@@ -66,6 +66,11 @@ export async function createProgram(
       await tx.insert(schema.programGates).values(
         t.gates.map((g) => ({ programId: p.id, stage: g.stage, key: g.key, label: g.label, kind: g.kind, threshold: g.threshold, required: g.required, sort: g.sort })),
       );
+    const kpis = await tx.select().from(schema.templateKpis).where(eq(schema.templateKpis.templateId, t.template.id));
+    if (kpis.length)
+      await tx.insert(schema.programKpis).values(kpis.map((k) => ({ programId: p.id, key: k.key, label: k.label, grp: k.grp, weeklyTarget: k.weeklyTarget, sort: k.sort })));
+    const tools = await tx.select().from(schema.templateTools).where(eq(schema.templateTools.templateId, t.template.id));
+    if (tools.length) await tx.insert(schema.programTools).values(tools.map((x) => ({ programId: p.id, toolSlug: x.toolSlug })));
     return p;
   });
   await audit({ actorId: actor.userId, entityType: "program", entityId: program.id, action: "program.create", after: { menteeId: input.menteeId, templateId: t.template.id, templateVersion: t.template.version } });
