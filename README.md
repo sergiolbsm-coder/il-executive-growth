@@ -33,7 +33,9 @@ metas por programa, check-in PDCA, resumo do mês com semáforo e conversão); p
 concluir uma ferramenta numa oferta comprova portões (pendente se for o mentorado; confirmado se for a equipe); revisão do mentor.
 **Score de Alavancagem** (0–100): informação, ferramentas, ofertas, estrutura e tração, com pesos editáveis por programa,
 próximos passos e histórico semanal.
-Próximo: edição de templates/portões pela interface, liberação de estágios por ferramenta-chave, Conteúdo, Fila Venture e Importações.
+**Conteúdo:** eixos editáveis por programa, calendário editorial (ideia → rascunho → agendada → publicada), KPIs da semana a partir das
+publicações, biblioteca de links com acesso rápido a arquivos e pastas do Drive (só os endereços; sem integração com a API do Google).
+Próximo: edição de templates/portões pela interface, liberação de estágios por ferramenta-chave, Fila Venture e Importações.
 
 ## Regras
 

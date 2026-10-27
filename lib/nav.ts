@@ -23,7 +23,7 @@ export const NAV: NavItem[] = [
   { label: "Escala do Negócio", icon: "🔺", href: "/app/escala", roles: all, status: "ready" },
   { label: "Cadência", icon: "🗓️", href: "/app/cadencia", roles: all, status: "ready" },
   { label: "Comercial", icon: "💼", href: "/app/comercial", roles: all, status: "ready" },
-  { label: "Conteúdo", icon: "✍️", href: "/app/conteudo", roles: all, status: "soon" },
+  { label: "Conteúdo", icon: "✍️", href: "/app/conteudo", roles: all, status: "ready" },
   { label: "Sessões e tarefas", icon: "✅", href: "/app/sessoes", roles: all, status: "ready" },
 
   { label: "Todas as ferramentas", icon: "🧰", href: "/app/ferramentas", roles: all, status: "ready", group: "Ferramentas" },
