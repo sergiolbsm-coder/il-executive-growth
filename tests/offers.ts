@@ -214,6 +214,16 @@ async function main() {
   assert.equal(await O.checkGate(ctx(xU), o2.id, "ficha-1-pagina", "Ficha preenchida por mim"), "pendente");
   assert.equal((await O.listOffers(ctx(mA), progX.id)).find((o) => o.id === o2.id)!.stage, 1, "pendente não conta");
   assert.equal((await O.listOffers(ctx(mA), progX.id)).find((o) => o.id === o2.id)!.pendingChecks, 1);
+  // fila de portões pendentes (equipe)
+  const pend = await O.listPendingGates(ctx(mA));
+  assert.equal(pend.length, 1);
+  assert.equal(pend[0].gateLabel.startsWith("Ficha de 1 página"), true);
+  assert.equal(pend[0].menteeName, "Mentorado X (fictício)");
+  assert.equal(pend[0].checkedByName, "Mentorado X (fictício)");
+  assert.equal((await O.listPendingGates(ctx(mB))).length, 0, "outro mentor não vê pendências alheias");
+  await must(O.listPendingGates(ctx(xU)), "Acesso negado");
+  assert.equal((await O.listPendingGates(ctx(dir))).length, 1);
+
   await must(O.checkGate(ctx(yU), o2.id, "ficha-1-pagina", "invasão"), "Acesso negado");
   await must(O.confirmGate(ctx(xU), o2.id, "ficha-1-pagina"), "Acesso negado");
   await must(O.confirmGate(ctx(mB), o2.id, "ficha-1-pagina"), "Acesso negado");
@@ -266,6 +276,20 @@ async function main() {
   await O.removeSale(ctx(admin), s4.id);
   await must(O.removeSale(ctx(admin), s4.id), "não encontrada");
   ok("origem da venda registrada; remover venda é só do administrador");
+
+  // listagens comerciais e por nível
+  const allSales = await O.listSalesForActor(ctx(mA));
+  assert.equal(allSales.length, 3, "vendas do mentorado X (a quarta foi removida)");
+  assert.ok(allSales.every((r) => r.menteeName === "Mentorado X (fictício)" && r.programName === "Programa X"));
+  assert.equal((await O.listSalesForActor(ctx(mB))).length, 0, "mentor B não vê vendas do X");
+  assert.equal((await O.listSalesForActor(ctx(xU))).length, 3, "mentorado vê as próprias");
+  assert.equal((await O.listSalesForActor(ctx(yU))).length, 0);
+  assert.equal((await O.listSalesForActor(ctx(admin))).length, 3);
+  const byLvl = await O.salesByLevel(ctx(mA), progX.id);
+  assert.deepEqual(byLvl.get(1), { sales: 3, cents: 250000 + 180000 + 90000 }, "vendas somadas no nível 1 (oferta de Palestras)");
+  assert.equal(byLvl.get(3), undefined, "nível sem oferta não aparece");
+  await must(O.salesByLevel(ctx(mB), progX.id), "Acesso negado");
+  ok("listagens: fila de portões pendentes, vendas do usuário e vendas por nível");
 
   // auditoria
   const log = await db.select().from(schema.activityLog);

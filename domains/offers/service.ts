@@ -1,10 +1,11 @@
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { audit } from "@/lib/audit";
-import { type AuthContext, ForbiddenError, canDeleteRecords, canEditProgram, canViewMentee } from "@/lib/authorization";
+import { type AuthContext, ForbiddenError, canDeleteRecords, canEditProgram, canViewMentee, isStaff } from "@/lib/authorization";
 import { getDb, schema } from "@/lib/db";
 import type { Offer } from "@/lib/db/schema";
 import { ValidationError } from "@/lib/errors";
-import { toRef } from "@/domains/mentees/service";
+import { listMentees, toRef } from "@/domains/mentees/service";
 import { loadProgram } from "@/domains/programs/service";
 import { type GateDef, type ScheduleStatus, computeStage, scheduleStatus, todayBR } from "./stage";
 
@@ -281,4 +282,65 @@ export async function removeSale(actor: AuthContext, saleId: string) {
   if (!s) throw new ValidationError("Venda não encontrada.");
   await db.delete(schema.sales).where(eq(schema.sales.id, saleId));
   await audit({ actorId: actor.userId, entityType: "offer", entityId: s.offerId, action: "offer.sale_remove", before: s });
+}
+
+/** Itens de portão marcados pelo mentorado que aguardam confirmação, nos mentorados que a equipe pode ver. */
+export async function listPendingGates(actor: AuthContext) {
+  if (!isStaff(actor)) throw new ForbiddenError();
+  const ids = (await listMentees(actor)).map((m) => m.id);
+  if (!ids.length) return [];
+  const db = await getDb();
+  const rows = await db
+    .select({
+      offerId: schema.offers.id, offerName: schema.offers.name, offerStatus: schema.offers.status,
+      programId: schema.programs.id, programName: schema.programs.name, menteeName: schema.mentees.fullName,
+      gateKey: schema.offerGateChecks.gateKey, gateLabel: schema.programGates.label,
+      evidence: schema.offerGateChecks.evidence, checkedBy: schema.offerGateChecks.checkedBy, checkedAt: schema.offerGateChecks.checkedAt,
+    })
+    .from(schema.offerGateChecks)
+    .innerJoin(schema.offers, eq(schema.offers.id, schema.offerGateChecks.offerId))
+    .innerJoin(schema.programs, eq(schema.programs.id, schema.offers.programId))
+    .innerJoin(schema.mentees, eq(schema.mentees.id, schema.programs.menteeId))
+    .leftJoin(schema.programGates, and(eq(schema.programGates.programId, schema.programs.id), eq(schema.programGates.key, schema.offerGateChecks.gateKey)))
+    .where(and(eq(schema.offerGateChecks.state, "pendente"), inArray(schema.mentees.id, ids)))
+    .orderBy(asc(schema.offerGateChecks.checkedAt));
+  const who = [...new Set(rows.map((r) => r.checkedBy).filter((x): x is string => !!x))];
+  const names = new Map<string, string>();
+  if (who.length) for (const u of await db.select({ id: schema.users.id, name: schema.users.name }).from(schema.users).where(inArray(schema.users.id, who))) names.set(u.id, u.name);
+  return rows.map((r) => ({ ...r, gateLabel: r.gateLabel ?? r.gateKey, checkedByName: r.checkedBy ? (names.get(r.checkedBy) ?? null) : null }));
+}
+
+/** Todas as vendas dos mentorados que o usuário pode ver (mentorado: as próprias), com a oferta de origem. */
+export async function listSalesForActor(actor: AuthContext) {
+  const ids = (await listMentees(actor)).map((m) => m.id);
+  if (!ids.length) return [];
+  const db = await getDb();
+  const origin = alias(schema.offers, "origin");
+  return db
+    .select({
+      id: schema.sales.id, soldAt: schema.sales.soldAt, clientName: schema.sales.clientName, valueCents: schema.sales.valueCents,
+      channel: schema.sales.channel, offerId: schema.offers.id, offerName: schema.offers.name, offerLevel: schema.offers.level,
+      programId: schema.programs.id, programName: schema.programs.name, menteeName: schema.mentees.fullName,
+      originOfferId: schema.sales.originOfferId, originName: origin.name,
+    })
+    .from(schema.sales)
+    .innerJoin(schema.offers, eq(schema.offers.id, schema.sales.offerId))
+    .innerJoin(schema.programs, eq(schema.programs.id, schema.offers.programId))
+    .innerJoin(schema.mentees, eq(schema.mentees.id, schema.programs.menteeId))
+    .leftJoin(origin, eq(origin.id, schema.sales.originOfferId))
+    .where(inArray(schema.mentees.id, ids))
+    .orderBy(desc(schema.sales.soldAt), desc(schema.sales.createdAt));
+}
+
+/** Vendas realizadas por nível da Escala do Negócio (nível da OFERTA) em um programa. */
+export async function salesByLevel(actor: AuthContext, programId: string) {
+  await viewable(actor, programId);
+  const db = await getDb();
+  const rows = await db
+    .select({ level: schema.offers.level, n: sql<number>`count(${schema.sales.id})::int`, cents: sql<string>`coalesce(sum(${schema.sales.valueCents}), 0)::text` })
+    .from(schema.offers)
+    .leftJoin(schema.sales, eq(schema.sales.offerId, schema.offers.id))
+    .where(eq(schema.offers.programId, programId))
+    .groupBy(schema.offers.level);
+  return new Map(rows.map((r) => [r.level, { sales: r.n, cents: Number(r.cents) }]));
 }
