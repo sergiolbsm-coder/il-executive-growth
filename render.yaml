@@ -1,0 +1,25 @@
+# Blueprint do serviço (NÃO aplicado — publicar só com autorização).
+services:
+  - type: web
+    name: il-executive-growth
+    runtime: node
+    plan: free          # free hiberna sem acessos; avaliar plano pago para uso diário
+    region: virginia    # mais próxima do Brasil entre as regiões do Render (o Neon está em sa-east-1)
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /login
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: APP_URL
+        value: https://growth.institutodalideranca.com.br
+      - key: DATABASE_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: EMAIL_REPLY_TO
+        sync: false
