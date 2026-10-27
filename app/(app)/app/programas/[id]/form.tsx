@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition, useActionState } from "react";
 import { SubmitButton } from "@/components/ui";
-import { updateProgramAction } from "./actions";
+import { loadDefaultsAction, updateProgramAction, type ProgramState } from "./actions";
 
 export function ProgramForm({
   programId,
@@ -40,5 +40,17 @@ export function ProgramForm({
       {state?.ok && <div className="msg ok">{state.ok}</div>}
       <SubmitButton>Salvar</SubmitButton>
     </form>
+  );
+}
+
+export function LoadDefaultsButton({ programId }: { programId: string }) {
+  const [pending, start] = useTransition();
+  const [res, setRes] = useState<ProgramState>();
+  return (
+    <div>
+      <button className="btn sec" disabled={pending} onClick={() => start(async () => setRes(await loadDefaultsAction(programId)))}>{pending ? "Carregando…" : "Carregar padrões do template"}</button>
+      {res?.error && <div className="msg err">{res.error}</div>}
+      {res?.ok && <div className="msg ok">{res.ok}</div>}
+    </div>
   );
 }

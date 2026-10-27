@@ -5,6 +5,10 @@ import { createMentee } from "../domains/mentees/service";
 import { checkGate, createOffer, recordSale } from "../domains/offers/service";
 import { todayBR } from "../domains/offers/stage";
 import { createProgram } from "../domains/programs/service";
+import { createSession, createTask } from "../domains/sessions/service";
+import { saveCheckin, saveKpiEntries } from "../domains/cadence/service";
+import { createEntry, saveEntry } from "../domains/tools/service";
+import { currentWeek } from "../lib/week";
 import { listTemplates } from "../domains/templates/service";
 import { createUser } from "../domains/users/service";
 import { generateTempPassword } from "../lib/auth/core";
@@ -45,7 +49,19 @@ async function main() {
   const o2 = await createOffer(mc, prog.id, { revenueSlug: "instituicoes", name: "Diagnóstico (exemplo)", problem: "Gestão escolar travada", audience: "Escolas privadas", targetStage: 5, dueDate: soon, wave: 1 });
   for (const k of ["ficha-1-pagina", "preco", "pitch", "proposta", "material-entrega", "canal-aquisicao", "metas-semanais"]) await checkGate(mc, o2.id, k, `Evidência de exemplo: ${k}`);
   await recordSale(mc, o2.id, { clientName: "Escola Exemplo (fictícia)", valueCents: 250000, soldAt: today, channel: "LinkedIn", originOfferId: o1.id });
-  await createOffer(mc, prog.id, { revenueSlug: "conselhos", name: "Advisory (exemplo)", problem: "Decisões estratégicas sem apoio", audience: "Mantenedores", targetStage: 3, wave: 3 });
+  const o3 = await createOffer(mc, prog.id, { revenueSlug: "conselhos", name: "Advisory (exemplo)", problem: "Decisões estratégicas sem apoio", audience: "Mantenedores", targetStage: 3, wave: 3 });
+
+  // Sessões, tarefas, cadência e ferramentas de exemplo
+  const sess = await createSession(mc, prog.id, { heldOn: today, title: "Kick-off (exemplo)", summary: "Alinhamos o propósito e o portfólio de ofertas.", decisions: "Começar por palestras e diagnóstico.", internalNotes: "Nota interna de exemplo: mentorada ainda insegura com preço." });
+  await createTask(mc, prog.id, { title: "Enviar a ficha do Advisory", dueDate: shift(3), sessionId: sess.id, offerId: o3.id });
+  await createTask(mc, prog.id, { title: "Revisar o pitch das palestras", assignee: "mentor", dueDate: shift(-2) });
+  const wk = currentWeek();
+  await saveKpiEntries(mc, prog.id, wk, { conexoes: 12, "contatos-diretos": 6, "reunioes-realizadas": 2, "posts-linkedin": 3, comentarios: 7 });
+  await saveCheckin(mc, prog.id, wk, { plan: "Prospectar 20 contas", done: "Prospectei 12", result: "2 reuniões", adjust: "Mais contatos pela manhã", objection: "Preço", traffic: "amarelo" });
+  const ficha = await createEntry(mc, prog.id, "sintese-profissional", { title: "Síntese (exemplo)" });
+  await saveEntry(mc, ficha.id, { problemas: "Ajudei escolas a estruturar produtos.", especialidades: "Produtos educacionais e expansão.", resultados: "Crescimento de 47% na área B2B." }, true);
+  const e2 = await createEntry(mc, prog.id, "ficha-oferta", { offerId: o3.id });
+  await saveEntry(mc, e2.id, { publico: "Mantenedores" }, false);
 
   // Em desenvolvimento, não exige a troca de senha a cada seed
   await (await getDb()).update(schema.users).set({ mustChangePassword: false });

@@ -10,7 +10,7 @@ import { Meters, ProgramMap } from "@/components/ProgramMap";
 import { ScheduleBadge, StageBar } from "@/components/StageBar";
 import { stageName } from "@/lib/stages";
 import { NewOfferForm } from "../../ofertas/forms";
-import { ProgramForm } from "./form";
+import { LoadDefaultsButton, ProgramForm } from "./form";
 
 export default async function ProgramPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -33,6 +33,13 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
         {program.model ?? "sem modelo"} · {fmtDay(program.startDate)} → {fmtDay(program.endDate)} · {program.weeklyHours ?? "—"} h/semana ·
         snapshot do template v{program.templateVersion ?? "—"} · <span className={`badge${program.status === "ativo" ? "" : " muted"}`}>{program.status}</span>
       </p>
+
+      <div className="row" style={{ marginBottom: 16 }}>
+        <Link href={`/app/cadencia?p=${program.id}`} className="btn sec">🗓️ Cadência</Link>
+        <Link href={`/app/score?p=${program.id}`} className="btn sec">🚀 Score</Link>
+        <Link href={`/app/ferramentas?p=${program.id}`} className="btn sec">🧰 Ferramentas</Link>
+        <Link href="/app/sessoes" className="btn sec">✅ Sessões e tarefas</Link>
+      </div>
 
       <div className="card">
         <h2 className="h2">Propósito</h2>
@@ -114,6 +121,14 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
           </tbody>
         </table>
       </div>
+
+      {canEdit && (
+        <div className="card">
+          <h2 className="h2">Padrões do template</h2>
+          <p className="sub">Completa este programa com portões, KPIs, ferramentas e pesos do score que o template tem e o programa ainda não (não altera nada que já exista).</p>
+          <LoadDefaultsButton programId={program.id} />
+        </div>
+      )}
 
       {canEdit && (
         <div className="card">

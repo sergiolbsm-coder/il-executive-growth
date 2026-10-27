@@ -18,7 +18,7 @@ npm run typecheck
 Sem `DATABASE_URL` o app usa PGlite em `.data/pglite`. Migrations em `db/migrations/*.sql` são aplicadas ao conectar.
 Primeiro administrador em produção: `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` + `npm run admin:create`.
 
-## Estado (Sprint 1, passos 1 e 2)
+## Estado (Sprint 1)
 
 Pronto: login e troca obrigatória de senha, papéis (admin · direção · mentor · mentorado), mentorados (com/sem acesso),
 atribuição de mentores, templates (base IDL: 9 fontes de receita + Escala do Negócio, derivação por segmento/modelo),
@@ -27,7 +27,13 @@ programas com **snapshot** do template, auditoria, menu lateral.
 derivado de **portões editáveis** por template e por programa; marcação com evidência (mentorado marca como pendente, equipe confirma);
 vendas com origem (estágio 5+ só com venda registrada); prazo (cumprida / no prazo / em risco / atrasada);
 mapa das receitas × estágios e medidores da meta.
-Próximo: edição de templates/portões pela interface, Caixa de ferramentas, Score de Alavancagem, liberação por ferramenta-chave, check-in e KPIs semanais.
+**Acompanhamento:** sessões (ata compartilhada; notas internas só da equipe) e tarefas; cadência semanal (KPIs meta × realizado com
+metas por programa, check-in PDCA, resumo do mês com semáforo e conversão); portões a confirmar; Escala do Negócio; Comercial.
+**Caixa de ferramentas:** ferramentas declarativas (formulários definidos por campos, editáveis pelo admin/direção) e externas;
+concluir uma ferramenta numa oferta comprova portões (pendente se for o mentorado; confirmado se for a equipe); revisão do mentor.
+**Score de Alavancagem** (0–100): informação, ferramentas, ofertas, estrutura e tração, com pesos editáveis por programa,
+próximos passos e histórico semanal.
+Próximo: edição de templates/portões pela interface, liberação de estágios por ferramenta-chave, Conteúdo, Fila Venture e Importações.
 
 ## Regras
 

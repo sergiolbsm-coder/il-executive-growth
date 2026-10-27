@@ -348,3 +348,26 @@ table.wl.wl-contacts td:nth-child(9) select { min-width: 150px; }
 .pyr-row { padding: 10px 14px; border-radius: 8px; color: #fff; text-align: center; display: flex; flex-direction: column; gap: 2px; font-size: 13px; }
 .pyr-row b { font-size: 14px; }
 .pyr-row span { font-size: 11px; opacity: .9; }
+
+/* ── Cadência, score e ferramentas ─────────────────────────────────────── */
+.tl { display: inline-flex; padding: 2px 10px; border-radius: 100px; font: 600 11px 'DM Sans', sans-serif; }
+.tl-verde { color: #006B67; background: rgba(0,208,201,.14); }
+.tl-amarelo { color: #8A5A00; background: rgba(255,170,0,.18); }
+.tl-vermelho { color: #B0003F; background: rgba(255,0,96,.10); }
+.tl-sem-meta { color: var(--idl-text-muted); background: var(--idl-background-soft); }
+.bar { height: 8px; border-radius: 4px; background: var(--idl-background-soft); overflow: hidden; }
+.bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--idl-turquoise), var(--idl-violet)); }
+.score-big { font: 700 56px 'Cormorant Garamond', serif; color: var(--idl-purple); line-height: 1; }
+.score-big small { font: 500 16px 'DM Sans', sans-serif; color: var(--idl-text-muted); }
+.kgrid { display: grid; gap: 10px 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.kgrid label { margin: 0 0 3px; }
+.kgrid .tgt { font-size: 11px; color: var(--idl-text-muted); font-weight: 400; }
+.task { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--idl-border); }
+.task:last-child { border-bottom: 0; }
+.task.done .t { text-decoration: line-through; opacity: .6; }
+.task .t { flex: 1; min-width: 0; }
+.tool-card h3 { margin: 0 0 4px; font-size: 15px; color: var(--idl-purple-dark); }
+.entry-field { margin-top: 12px; }
+.entry-field .help { font-size: 11px; color: var(--idl-text-muted); }
+.chk { display: flex; gap: 8px; align-items: center; font-weight: 400; margin: 4px 0; }
+.chk input { width: auto; }
