@@ -3,6 +3,7 @@ import { audit } from "@/lib/audit";
 import { type AuthContext, ForbiddenError, canManageTemplates, isStaff } from "@/lib/authorization";
 import { getDb, schema } from "@/lib/db";
 import { ValidationError } from "@/lib/errors";
+import { type GatePatch, type NewGate, cleanGatePatch, cleanNewGate } from "@/domains/offers/gate-input";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -27,13 +28,14 @@ export async function getTemplate(actor: AuthContext, id: string) {
   if (!isStaff(actor)) throw new ForbiddenError();
   const db = await getDb();
   // Três consultas independentes em paralelo (banco remoto: 1 ida e volta em vez de 3).
-  const [[template], sources, levels] = await Promise.all([
+  const [[template], sources, levels, gates] = await Promise.all([
     db.select().from(schema.programTemplates).where(eq(schema.programTemplates.id, id)).limit(1),
     db.select().from(schema.templateRevenueSources).where(eq(schema.templateRevenueSources.templateId, id)).orderBy(asc(schema.templateRevenueSources.sort)),
     db.select().from(schema.templatePyramidLevels).where(eq(schema.templatePyramidLevels.templateId, id)).orderBy(asc(schema.templatePyramidLevels.level)),
+    db.select().from(schema.templateGates).where(eq(schema.templateGates.templateId, id)).orderBy(asc(schema.templateGates.stage), asc(schema.templateGates.sort)),
   ]);
   if (!template) throw new ValidationError("Template não encontrado.");
-  return { template, sources, levels };
+  return { template, sources, levels, gates };
 }
 
 /** Deriva um template (segmento/modelo) a partir de outro: copia catálogo e pirâmide. Programas existentes não são afetados. */
@@ -64,6 +66,10 @@ export async function deriveTemplate(
     if (src.levels.length)
       await tx.insert(schema.templatePyramidLevels).values(
         src.levels.map((l) => ({ templateId: t.id, level: l.level, name: l.name, volume: l.volume, ticket: l.ticket, effort: l.effort, role: l.role })),
+      );
+    if (src.gates.length)
+      await tx.insert(schema.templateGates).values(
+        src.gates.map((g) => ({ templateId: t.id, stage: g.stage, key: g.key, label: g.label, kind: g.kind, threshold: g.threshold, required: g.required, sort: g.sort })),
       );
     return t;
   });
@@ -166,4 +172,30 @@ export async function addTemplateSource(
   });
   await bump(templateId);
   await audit({ actorId: actor.userId, entityType: "template", entityId: templateId, action: "template.add_source", after: input });
+}
+
+/** Edita um portão do template (rótulo, estágio, obrigatório, mínimo de vendas). Programas já criados não mudam. */
+export async function updateTemplateGate(actor: AuthContext, templateId: string, key: string, patch: GatePatch) {
+  if (!canManageTemplates(actor)) throw new ForbiddenError();
+  const db = await getDb();
+  const w = and(eq(schema.templateGates.templateId, templateId), eq(schema.templateGates.key, key));
+  const [before] = await db.select().from(schema.templateGates).where(w).limit(1);
+  if (!before) throw new ValidationError("Portão não encontrado.");
+  const set = cleanGatePatch(patch, before.kind);
+  if (!Object.keys(set).length) return;
+  await db.update(schema.templateGates).set(set).where(w);
+  await bump(templateId);
+  await audit({ actorId: actor.userId, entityType: "template", entityId: templateId, action: "template.update_gate", before, after: { key, ...set } });
+}
+
+/** Acrescenta um portão ao template. */
+export async function addTemplateGate(actor: AuthContext, templateId: string, input: NewGate) {
+  if (!canManageTemplates(actor)) throw new ForbiddenError();
+  const g = cleanNewGate(input);
+  const db = await getDb();
+  const existing = await db.select().from(schema.templateGates).where(eq(schema.templateGates.templateId, templateId));
+  if (existing.some((x) => x.key === g.key)) throw new ValidationError("Já existe um portão com este identificador.");
+  await db.insert(schema.templateGates).values({ templateId, ...g, sort: Math.max(0, ...existing.map((x) => x.sort)) + 1 });
+  await bump(templateId);
+  await audit({ actorId: actor.userId, entityType: "template", entityId: templateId, action: "template.add_gate", after: g });
 }

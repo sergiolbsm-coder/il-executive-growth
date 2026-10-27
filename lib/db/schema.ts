@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  bigint,
   bigserial,
   boolean,
   date,
@@ -178,4 +179,91 @@ export const programPyramidLevels = pgTable(
     role: text("role").notNull(),
   },
   (t) => [unique().on(t.programId, t.level)],
+);
+
+const gateColumns = {
+  stage: integer("stage").notNull(),
+  key: text("key").notNull(),
+  label: text("label").notNull(),
+  kind: text("kind").$type<"manual" | "vendas">().notNull().default("manual"),
+  threshold: integer("threshold"),
+  required: boolean("required").notNull().default(true),
+  sort: integer("sort").notNull().default(0),
+};
+
+export const templateGates = pgTable(
+  "template_gates",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    templateId: uuid("template_id").notNull().references(() => programTemplates.id, { onDelete: "cascade" }),
+    ...gateColumns,
+  },
+  (t) => [unique().on(t.templateId, t.key)],
+);
+
+export const programGates = pgTable(
+  "program_gates",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    programId: uuid("program_id").notNull().references(() => programs.id, { onDelete: "cascade" }),
+    ...gateColumns,
+  },
+  (t) => [unique().on(t.programId, t.key)],
+);
+
+export const offers = pgTable(
+  "offers",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    programId: uuid("program_id").notNull().references(() => programs.id, { onDelete: "cascade" }),
+    revenueSlug: text("revenue_slug").notNull(),
+    name: text("name").notNull(),
+    level: integer("level").notNull(),
+    problem: text("problem").notNull(),
+    audience: text("audience").notNull(),
+    priceNote: text("price_note"),
+    wave: integer("wave"),
+    dueDate: date("due_date"),
+    targetStage: integer("target_stage").notNull().default(3),
+    status: text("status").$type<"ativa" | "pausada" | "descartada">().notNull().default("ativa"),
+    statusReason: text("status_reason"),
+    createdBy: uuid("created_by").references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("offers_program_idx").on(t.programId)],
+);
+export type Offer = typeof offers.$inferSelect;
+
+export const offerGateChecks = pgTable(
+  "offer_gate_checks",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    offerId: uuid("offer_id").notNull().references(() => offers.id, { onDelete: "cascade" }),
+    gateKey: text("gate_key").notNull(),
+    evidence: text("evidence").notNull(),
+    state: text("state").$type<"pendente" | "confirmado">().notNull(),
+    checkedBy: uuid("checked_by").references(() => users.id),
+    checkedAt: timestamp("checked_at", { withTimezone: true }).notNull().defaultNow(),
+    confirmedBy: uuid("confirmed_by").references(() => users.id),
+    confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
+  },
+  (t) => [unique().on(t.offerId, t.gateKey)],
+);
+
+export const sales = pgTable(
+  "sales",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    offerId: uuid("offer_id").notNull().references(() => offers.id, { onDelete: "cascade" }),
+    clientName: text("client_name").notNull(),
+    valueCents: bigint("value_cents", { mode: "number" }).notNull(),
+    soldAt: date("sold_at").notNull(),
+    channel: text("channel"),
+    originOfferId: uuid("origin_offer_id").references(() => offers.id, { onDelete: "set null" }),
+    notes: text("notes"),
+    createdBy: uuid("created_by").references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("sales_offer_idx").on(t.offerId)],
 );

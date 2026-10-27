@@ -3,6 +3,7 @@ import { audit } from "@/lib/audit";
 import { type AuthContext, ForbiddenError, canCreateMentee, canEditProgram, canViewMentee } from "@/lib/authorization";
 import { getDb, schema } from "@/lib/db";
 import { ValidationError } from "@/lib/errors";
+import { type GatePatch, type NewGate, cleanGatePatch, cleanNewGate } from "@/domains/offers/gate-input";
 import { type MenteeRow, toRef } from "@/domains/mentees/service";
 import { getTemplate, type LevelPatch, type SourcePatch } from "@/domains/templates/service";
 
@@ -61,13 +62,17 @@ export async function createProgram(
       await tx.insert(schema.programPyramidLevels).values(
         t.levels.map((l) => ({ programId: p.id, level: l.level, name: l.name, volume: l.volume, ticket: l.ticket, effort: l.effort, role: l.role })),
       );
+    if (t.gates.length)
+      await tx.insert(schema.programGates).values(
+        t.gates.map((g) => ({ programId: p.id, stage: g.stage, key: g.key, label: g.label, kind: g.kind, threshold: g.threshold, required: g.required, sort: g.sort })),
+      );
     return p;
   });
   await audit({ actorId: actor.userId, entityType: "program", entityId: program.id, action: "program.create", after: { menteeId: input.menteeId, templateId: t.template.id, templateVersion: t.template.version } });
   return program;
 }
 
-async function loadProgram(programId: string) {
+export async function loadProgram(programId: string) {
   const db = await getDb();
   const [program] = await db.select().from(schema.programs).where(eq(schema.programs.id, programId)).limit(1);
   if (!program) throw new ValidationError("Programa não encontrado.");
@@ -78,11 +83,12 @@ export async function getProgram(actor: AuthContext, programId: string) {
   const { program, mentee } = await loadProgram(programId);
   if (!canViewMentee(actor, toRef(mentee))) throw new ForbiddenError();
   const db = await getDb();
-  const [sources, levels] = await Promise.all([
+  const [sources, levels, gates] = await Promise.all([
     db.select().from(schema.programRevenueSources).where(eq(schema.programRevenueSources.programId, programId)).orderBy(asc(schema.programRevenueSources.sort)),
     db.select().from(schema.programPyramidLevels).where(eq(schema.programPyramidLevels.programId, programId)).orderBy(asc(schema.programPyramidLevels.level)),
+    db.select().from(schema.programGates).where(eq(schema.programGates.programId, programId)).orderBy(asc(schema.programGates.stage), asc(schema.programGates.sort)),
   ]);
-  return { program, mentee, sources, levels, canEdit: canEditProgram(actor, toRef(mentee)) };
+  return { program, mentee, sources, levels, gates, canEdit: canEditProgram(actor, toRef(mentee)) };
 }
 
 async function editable(actor: AuthContext, programId: string) {
@@ -183,4 +189,28 @@ export async function listPrograms(actor: AuthContext, preloaded?: MenteeRow[]) 
   const rows = await db.select().from(schema.programs).orderBy(asc(schema.programs.createdAt));
   const ids = new Set(visible.map((m) => m.id));
   return rows.filter((p) => ids.has(p.menteeId));
+}
+
+/** Edita um portão DO PROGRAMA (o template não muda). Não afeta marcações já feitas, só o que passa a ser exigido. */
+export async function updateProgramGate(actor: AuthContext, programId: string, key: string, patch: GatePatch) {
+  await editable(actor, programId);
+  const db = await getDb();
+  const w = and(eq(schema.programGates.programId, programId), eq(schema.programGates.key, key));
+  const [before] = await db.select().from(schema.programGates).where(w).limit(1);
+  if (!before) throw new ValidationError("Portão não encontrado.");
+  const set = cleanGatePatch(patch, before.kind);
+  if (!Object.keys(set).length) return;
+  await db.update(schema.programGates).set(set).where(w);
+  await audit({ actorId: actor.userId, entityType: "program", entityId: programId, action: "program.update_gate", before, after: { key, ...set } });
+}
+
+/** Acrescenta um portão próprio ao programa. */
+export async function addProgramGate(actor: AuthContext, programId: string, input: NewGate) {
+  await editable(actor, programId);
+  const g = cleanNewGate(input);
+  const db = await getDb();
+  const existing = await db.select().from(schema.programGates).where(eq(schema.programGates.programId, programId));
+  if (existing.some((x) => x.key === g.key)) throw new ValidationError("Já existe um portão com este identificador.");
+  await db.insert(schema.programGates).values({ programId, ...g, sort: Math.max(0, ...existing.map((x) => x.sort)) + 1 });
+  await audit({ actorId: actor.userId, entityType: "program", entityId: programId, action: "program.add_gate", after: g });
 }
