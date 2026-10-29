@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createUser, resetPassword, setActive, setMentorScope, ValidationError } from "@/domains/users/service";
+import { createUser, resetPassword, setActive, setMentorScope, updateUser, ValidationError } from "@/domains/users/service";
 import { ForbiddenError } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import type { MentorScope, UserRole } from "@/lib/db/schema";
@@ -57,4 +57,12 @@ export async function setScopeAction(id: string, scope: MentorScope): Promise<Gr
   const r = await guard(() => setMentorScope(actor, id, scope));
   revalidatePath("/admin/usuarios");
   return r && "error" in r ? r : undefined;
+}
+
+export async function updateUserAction(id: string, name: string, email: string): Promise<GrantState> {
+  const actor = toContext(await requireUser());
+  const r = await guard(() => updateUser(actor, id, { name, email }));
+  revalidatePath("/admin/usuarios");
+  revalidatePath("/app/mentorados");
+  return r && "error" in r ? r : { ok: "Dados atualizados." };
 }

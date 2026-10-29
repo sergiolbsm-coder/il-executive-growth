@@ -491,3 +491,38 @@ export const libraryLinks = pgTable(
   },
   (t) => [index("library_links_program_idx").on(t.programId)],
 );
+
+export const supportTickets = pgTable(
+  "support_tickets",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    number: integer("number").generatedAlwaysAsIdentity(),
+    menteeId: uuid("mentee_id").notNull().references(() => mentees.id, { onDelete: "cascade" }),
+    openedBy: uuid("opened_by").references(() => users.id),
+    kind: text("kind").$type<"ajuda" | "duvida" | "problema" | "sugestao">().notNull(),
+    area: text("area").notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    pagePath: text("page_path"),
+    status: text("status").$type<"aberto" | "em_andamento" | "resolvido">().notNull().default("aberto"),
+    assignedTo: uuid("assigned_to").references(() => users.id),
+    solution: text("solution"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("support_tickets_mentee_idx").on(t.menteeId), index("support_tickets_status_idx").on(t.status, t.area)],
+);
+
+export const supportMessages = pgTable(
+  "support_messages",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    ticketId: uuid("ticket_id").notNull().references(() => supportTickets.id, { onDelete: "cascade" }),
+    authorId: uuid("author_id").references(() => users.id),
+    body: text("body").notNull(),
+    internal: boolean("internal").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("support_messages_ticket_idx").on(t.ticketId, t.createdAt)],
+);

@@ -381,3 +381,12 @@ table.wl.wl-contacts td:nth-child(9) select { min-width: 150px; }
 .spinner { width: 20px; height: 20px; border-radius: 50%; border: 3px solid var(--idl-border); border-top-color: var(--idl-violet);
   animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Chamados */
+.help-fab { position: fixed; right: 20px; bottom: 20px; z-index: 300; display: inline-flex; gap: 6px; align-items: center; padding: 12px 18px; border-radius: 100px;
+  background: var(--idl-magenta); color: #fff; font-weight: 700; text-decoration: none; box-shadow: 0 6px 20px rgba(255,0,96,.35); }
+.help-fab:hover { background: #d9004f; }
+@media (max-width: 640px) { .help-fab span { display: none; } }
+.msg-bubble { background: var(--idl-background-soft); border-radius: var(--r-sm); padding: 10px 14px; margin-bottom: 10px; }
+.bar-cell { display: inline-block; width: 120px; height: 8px; border-radius: 4px; background: var(--idl-background-soft); vertical-align: middle; margin-right: 8px; }
+.bar-fill { display: block; height: 100%; border-radius: 4px; background: var(--idl-violet); }

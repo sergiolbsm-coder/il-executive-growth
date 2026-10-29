@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { assignMentors, createMentee } from "@/domains/mentees/service";
+import { assignMentors, createMentee, updateMentee } from "@/domains/mentees/service";
 import { createProgram } from "@/domains/programs/service";
 import { ValidationError } from "@/lib/errors";
 import { ForbiddenError } from "@/lib/authorization";
@@ -64,4 +64,19 @@ export async function createProgramAction(menteeId: string, _: MenteeState, form
   );
   revalidatePath(`/app/mentorados/${menteeId}`);
   return "error" in r ? r : { ok: "Programa aberto a partir do template." };
+}
+
+export async function updateMenteeAction(menteeId: string, _: MenteeState, form: FormData): Promise<MenteeState> {
+  const actor = toContext(await requireUser());
+  const r = await guard(() =>
+    updateMentee(actor, menteeId, {
+      fullName: String(form.get("fullName") ?? ""),
+      email: String(form.get("email") ?? ""),
+      segment: String(form.get("segment") ?? ""),
+    }),
+  );
+  revalidatePath(`/app/mentorados/${menteeId}`);
+  revalidatePath("/app/mentorados");
+  revalidatePath("/admin/usuarios");
+  return r && "error" in r ? r : { ok: "Dados do mentorado atualizados." };
 }

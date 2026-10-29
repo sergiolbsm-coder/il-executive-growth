@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { SubmitButton } from "@/components/ui";
-import { assignMentorsAction, createMenteeAction, createProgramAction, type MenteeState } from "./actions";
+import { assignMentorsAction, createMenteeAction, createProgramAction, updateMenteeAction, type MenteeState } from "./actions";
 
 type Mentor = { id: string; name: string };
 type Template = { id: string; name: string; segment: string; model: string; version: number };
@@ -93,6 +93,23 @@ export function NewProgramForm({ menteeId, templates }: { menteeId: string; temp
       </div>
       <Feedback state={state} />
       <SubmitButton>Abrir programa</SubmitButton>
+    </form>
+  );
+}
+
+export function EditMenteeForm({ menteeId, initial, hasAccess }: { menteeId: string; initial: { fullName: string; email: string | null; segment: string | null }; hasAccess: boolean }) {
+  const [state, action] = useActionState(updateMenteeAction.bind(null, menteeId), undefined);
+  return (
+    <form action={action} className="card">
+      <h2 className="h2">Corrigir dados do mentorado</h2>
+      <label htmlFor="fullName">Nome completo</label>
+      <input id="fullName" name="fullName" defaultValue={initial.fullName} required />
+      <label htmlFor="email">E-mail{hasAccess ? " (também é o login)" : ""}</label>
+      <input id="email" name="email" type="email" defaultValue={initial.email ?? ""} required={hasAccess} />
+      <label htmlFor="segment">Segmento</label>
+      <input id="segment" name="segment" defaultValue={initial.segment ?? ""} />
+      <Feedback state={state} />
+      <SubmitButton>Salvar</SubmitButton>
     </form>
   );
 }

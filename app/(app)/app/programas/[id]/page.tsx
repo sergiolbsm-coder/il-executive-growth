@@ -29,6 +29,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
     <>
       <p className="sub"><Link href={`/app/mentorados/${mentee.id}`}>← {mentee.fullName}</Link></p>
       <h1>{program.name}</h1>
+      {canEdit && <p className="sub"><a href="#editar">✏️ Renomear / editar programa</a></p>}
       <p className="sub">
         {program.model ?? "sem modelo"} · {fmtDay(program.startDate)} → {fmtDay(program.endDate)} · {program.weeklyHours ?? "—"} h/semana ·
         snapshot do template v{program.templateVersion ?? "—"} · <span className={`badge${program.status === "ativo" ? "" : " muted"}`}>{program.status}</span>
@@ -132,8 +133,8 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
       )}
 
       {canEdit && (
-        <div className="card">
-          <h2 className="h2">Editar programa</h2>
+        <div className="card" id="editar">
+          <h2 className="h2">Editar programa (nome, propósito, datas)</h2>
           <ProgramForm
             programId={program.id}
             initial={{ name: program.name, purpose: program.purpose, weeklyHours: program.weeklyHours, startDate: program.startDate, endDate: program.endDate, status: program.status }}

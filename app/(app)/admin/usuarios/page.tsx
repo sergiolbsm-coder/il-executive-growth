@@ -26,7 +26,7 @@ export default async function UsersPage() {
                 <td><span className="badge">{ROLE_LABEL[u.role] ?? u.role}</span></td>
                 <td>{u.active ? (u.mustChangePassword ? "aguarda 1º acesso" : "ativo") : <span className="badge muted">inativo</span>}</td>
                 <td>{u.lastLoginAt ? fmtDateTimeFull(u.lastLoginAt.toISOString()) : "—"}</td>
-                <td><RowActions id={u.id} active={u.active} self={u.id === user.id} role={u.role} scope={u.mentorScope} /></td>
+                <td><RowActions id={u.id} active={u.active} self={u.id === user.id} role={u.role} scope={u.mentorScope} name={u.name} email={u.email} /></td>
               </tr>
             ))}
           </tbody>

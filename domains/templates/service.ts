@@ -205,3 +205,27 @@ export async function addTemplateGate(actor: AuthContext, templateId: string, in
   await bump(templateId);
   await audit({ actorId: actor.userId, entityType: "template", entityId: templateId, action: "template.add_gate", after: g });
 }
+
+/** Renomeia o template (plano) e ajusta segmento/modelo/observações. Programas já criados não mudam. */
+export async function updateTemplate(
+  actor: AuthContext,
+  templateId: string,
+  input: { name: string; segment: string; model: string; notes?: string | null },
+) {
+  if (!canManageTemplates(actor)) throw new ForbiddenError();
+  const name = input.name.trim();
+  const segment = input.segment.trim();
+  const model = input.model.trim();
+  if (!name || !segment || !model) throw new ValidationError("Nome, segmento e modelo são obrigatórios.");
+  const db = await getDb();
+  const [before] = await db.select().from(schema.programTemplates).where(eq(schema.programTemplates.id, templateId)).limit(1);
+  if (!before) throw new ValidationError("Template não encontrado.");
+  const dup = await db
+    .select({ id: schema.programTemplates.id })
+    .from(schema.programTemplates)
+    .where(and(eq(schema.programTemplates.name, name), eq(schema.programTemplates.version, before.version)));
+  if (dup.some((d) => d.id !== templateId)) throw new ValidationError("Já existe um template com este nome nesta versão.");
+  const notes = input.notes?.trim() || null;
+  await db.update(schema.programTemplates).set({ name, segment, model, notes, updatedAt: new Date() }).where(eq(schema.programTemplates.id, templateId));
+  await audit({ actorId: actor.userId, entityType: "template", entityId: templateId, action: "template.update", before: { name: before.name, segment: before.segment, model: before.model }, after: { name, segment, model } });
+}

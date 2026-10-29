@@ -5,7 +5,7 @@ import { listTemplates } from "@/domains/templates/service";
 import { ForbiddenError, canCreateMentee } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { fmtDay } from "@/lib/format";
-import { AssignMentorsForm, NewProgramForm } from "../forms";
+import { AssignMentorsForm, EditMenteeForm, NewProgramForm } from "../forms";
 
 export default async function MenteePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -62,6 +62,7 @@ export default async function MenteePage({ params }: { params: Promise<{ id: str
           {templates.length > 0 && <NewProgramForm menteeId={mentee.id} templates={templates} />}
         </>
       )}
+    {manage && <EditMenteeForm menteeId={mentee.id} initial={{ fullName: mentee.fullName, email: mentee.email, segment: mentee.segment }} hasAccess={!!mentee.userId} />}
     </>
   );
 }

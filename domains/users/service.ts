@@ -67,6 +67,30 @@ export async function createUser(
   return { user, tempPassword, mail };
 }
 
+/**
+ * Corrige nome/e-mail. Sem checagem de permissão (uso interno): quem chama já autorizou.
+ * Mantém o cadastro de mentorado vinculado ao login em sincronia.
+ */
+export async function applyUserIdentity(userId: string, input: { name: string; email: string }) {
+  const name = input.name.trim();
+  const email = normalizeEmail(input.email);
+  if (!name) throw new ValidationError("Informe o nome.");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new ValidationError("E-mail inválido.");
+  const db = await getDb();
+  const [before] = await db.select().from(schema.users).where(eq(schema.users.id, userId)).limit(1);
+  if (!before) throw new ValidationError("Usuário não encontrado.");
+  if (before.email.toLowerCase() !== email && (await emailTaken(email))) throw new ValidationError("Já existe um usuário com este e-mail.");
+  await db.update(schema.users).set({ name, email, updatedAt: new Date() }).where(eq(schema.users.id, userId));
+  await db.update(schema.mentees).set({ fullName: name, email, updatedAt: new Date() }).where(eq(schema.mentees.userId, userId));
+  return { before, name, email };
+}
+
+export async function updateUser(actor: AuthContext, userId: string, input: { name: string; email: string }) {
+  if (!canManageUsers(actor)) throw new ForbiddenError();
+  const { before, name, email } = await applyUserIdentity(userId, input);
+  await audit({ actorId: actor.userId, entityType: "user", entityId: userId, action: "user.update", before: { name: before.name, email: before.email }, after: { name, email } });
+}
+
 /** Admin redefine a senha (informada ou gerada), força troca no próximo acesso, encerra sessões e reenvia o e-mail. */
 export async function resetPassword(
   actor: AuthContext,

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTemplate, listTemplates } from "@/domains/templates/service";
 import { canManageTemplates } from "@/lib/authorization";
+import { EditTemplateForm } from "./form";
 import { requireUser, toContext } from "@/lib/auth/session";
 
 export default async function TemplatesPage() {
@@ -12,13 +13,14 @@ export default async function TemplatesPage() {
   return (
     <>
       <h1>Templates</h1>
-      <p className="sub">Base → segmento → modelo. Programas recebem uma cópia (snapshot); editar um template não altera programas em andamento. Edição pela interface chega no próximo passo.</p>
+      <p className="sub">Base → segmento → modelo. Programas recebem uma cópia (snapshot); editar um template não altera programas em andamento. Aqui você renomeia o plano; a edição de receitas e portões chega no próximo passo.</p>
       {full.map(({ template, sources, levels }) => (
         <details key={template.id} className="card" open={full.length === 1}>
           <summary style={{ cursor: "pointer", fontWeight: 700 }}>
             {template.name} <span className="badge muted">{template.segment} / {template.model}</span> <span className="badge muted">v{template.version}</span>
           </summary>
           {template.notes && <p className="sub" style={{ marginTop: 12 }}>{template.notes}</p>}
+          <EditTemplateForm id={template.id} initial={{ name: template.name, segment: template.segment, model: template.model, notes: template.notes }} />
           <h2 className="h2">Escala do Negócio</h2>
           <table>
             <thead><tr><th>Nível</th><th>Volume</th><th>Ticket</th><th>Esforço</th><th>Papel</th></tr></thead>

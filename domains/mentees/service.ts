@@ -4,7 +4,7 @@ import { normalizeEmail } from "@/lib/auth/core";
 import { type AuthContext, type MenteeRef, ForbiddenError, canCreateMentee, canViewMentee } from "@/lib/authorization";
 import { getDb, schema } from "@/lib/db";
 import { ValidationError } from "@/lib/errors";
-import { type AccessGrant, createUser } from "@/domains/users/service";
+import { type AccessGrant, applyUserIdentity, createUser } from "@/domains/users/service";
 
 export interface MenteeRow {
   id: string;
@@ -121,4 +121,29 @@ export async function listMentors(actor: AuthContext) {
     .from(schema.users)
     .where(and(eq(schema.users.role, "mentor"), eq(schema.users.active, true)))
     .orderBy(asc(schema.users.name));
+}
+
+/** Corrige nome, e-mail e segmento do mentorado (admin/direção). Com login vinculado, nome e e-mail do login acompanham. */
+export async function updateMentee(
+  actor: AuthContext,
+  menteeId: string,
+  input: { fullName: string; email?: string; segment?: string },
+) {
+  if (!canCreateMentee(actor)) throw new ForbiddenError();
+  const fullName = input.fullName.trim();
+  if (!fullName) throw new ValidationError("Informe o nome do mentorado.");
+  const email = input.email?.trim() ? normalizeEmail(input.email) : null;
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new ValidationError("E-mail inválido.");
+  const db = await getDb();
+  const [m] = await db.select().from(schema.mentees).where(eq(schema.mentees.id, menteeId)).limit(1);
+  if (!m) throw new ValidationError("Mentorado não encontrado.");
+  if (m.userId) {
+    if (!email) throw new ValidationError("Mentorado com acesso precisa de e-mail.");
+    await applyUserIdentity(m.userId, { name: fullName, email });
+  }
+  await db
+    .update(schema.mentees)
+    .set({ fullName, email, segment: input.segment?.trim() || null, updatedAt: new Date() })
+    .where(eq(schema.mentees.id, menteeId));
+  await audit({ actorId: actor.userId, entityType: "mentee", entityId: menteeId, action: "mentee.update", before: { fullName: m.fullName, email: m.email, segment: m.segment }, after: { fullName, email, segment: input.segment?.trim() || null } });
 }
