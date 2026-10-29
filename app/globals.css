@@ -390,3 +390,18 @@ table.wl.wl-contacts td:nth-child(9) select { min-width: 150px; }
 .msg-bubble { background: var(--idl-background-soft); border-radius: var(--r-sm); padding: 10px 14px; margin-bottom: 10px; }
 .bar-cell { display: inline-block; width: 120px; height: 8px; border-radius: 4px; background: var(--idl-background-soft); vertical-align: middle; margin-right: 8px; }
 .bar-fill { display: block; height: 100%; border-radius: 4px; background: var(--idl-violet); }
+
+/* Trilha de ferramentas (checklist no estilo dos Desafios do Planner) */
+.desafios-barra-fundo { height: 8px; border-radius: 999px; background: var(--idl-background-soft); overflow: hidden; margin: 8px 0 4px; }
+.desafios-barra-preenchida { height: 100%; background: var(--idl-magenta); border-radius: 999px; transition: width .3s ease; }
+.desafio-card { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--idl-border); flex-wrap: wrap; }
+.desafio-card:last-child { border-bottom: none; }
+.desafio-check { font-size: 22px; width: 36px; flex-shrink: 0; line-height: 1.2; text-align: center; }
+.desafio-corpo { flex: 1; min-width: 220px; }
+.desafio-titulo { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+.desafio-descricao { font-size: 13px; color: var(--idl-text-muted); margin: 0; }
+.desafio-acao { margin-left: auto; flex-shrink: 0; }
+.desafio-card.desafio-concluido .desafio-titulo { text-decoration: line-through; opacity: .75; }
+.desafio-tag { display: inline-block; margin-top: 6px; font: 700 11.5px 'JetBrains Mono', monospace; padding: 2px 8px; border-radius: 20px; }
+.desafio-tag-ok { background: #e9f9f2; color: #1a9e6e; }
+.desafio-tag-prazo { background: var(--idl-background-soft); color: var(--idl-text-muted); }

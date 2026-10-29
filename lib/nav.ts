@@ -27,7 +27,7 @@ export const NAV: NavItem[] = [
   { label: "Sessões e tarefas", icon: "✅", href: "/app/sessoes", roles: all, status: "ready" },
 
   { label: "Pedir ajuda", icon: "🆘", href: "/app/chamados", roles: ["mentorado"], status: "ready" },
-  { label: "Todas as ferramentas", icon: "🧰", href: "/app/ferramentas", roles: all, status: "ready", group: "Ferramentas" },
+  { label: "Trilha de ferramentas", icon: "🧰", href: "/app/ferramentas", roles: all, status: "ready", group: "Ferramentas" },
 
   { label: "Portões a confirmar", icon: "🚪", href: "/app/portoes", roles: staff, status: "ready", group: "Operação" },
   { label: "Chamados e dúvidas", icon: "🆘", href: "/app/chamados", roles: staff, status: "ready", group: "Operação" },

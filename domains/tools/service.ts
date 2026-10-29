@@ -184,7 +184,7 @@ export async function listProgramTools(actor: AuthContext, programId: string) {
     tools: tools.map(({ t }) => {
       const mine = entries.filter((e) => e.toolSlug === t.slug);
       const best: EntryCredit = mine.some((e) => e.status === "concluida" && e.reviewedAt) ? "revisada" : mine.some((e) => e.status === "concluida") ? "concluida" : mine.length ? "rascunho" : null;
-      return { ...t, gateKeys: links.filter((l) => l.toolSlug === t.slug).map((l) => l.gateKey), entries: mine.map((e) => ({ id: e.id, title: e.title, status: e.status, reviewed: !!e.reviewedAt, offerName: e.offerId ? (offerNames.get(e.offerId) ?? null) : null, updatedAt: e.updatedAt })), best };
+      return { ...t, gateKeys: links.filter((l) => l.toolSlug === t.slug).map((l) => l.gateKey), entries: mine.map((e) => ({ id: e.id, offerId: e.offerId, title: e.title, status: e.status, reviewed: !!e.reviewedAt, offerName: e.offerId ? (offerNames.get(e.offerId) ?? null) : null, updatedAt: e.updatedAt })), best };
     }),
   };
 }

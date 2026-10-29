@@ -88,3 +88,15 @@ export function ReviewButton({ entryId }: { entryId: string }) {
     </div>
   );
 }
+
+/** Botão "Começar" da trilha: abre uma entrada em branco (opcionalmente já ligada a uma oferta) e vai para ela. */
+export function StartButton({ programId, slug, offerId, label = "Começar" }: { programId: string; slug: string; offerId?: string; label?: string }) {
+  const [state, action] = useActionState(createEntryAction.bind(null, programId, slug), undefined);
+  return (
+    <form action={action}>
+      {offerId && <input type="hidden" name="offerId" value={offerId} />}
+      <SubmitButton className="btn sec" pendingLabel="Abrindo…">{label}</SubmitButton>
+      {state?.error && <div className="msg err">{state.error}</div>}
+    </form>
+  );
+}
