@@ -30,7 +30,7 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
   const mentees = await listMentees(ctx);
   const programs = (await listPrograms(ctx, mentees)).filter((p) => p.status !== "encerrado").map((p) => ({ ...p, menteeName: mentees.find((m) => m.id === p.menteeId)?.fullName }));
   const prog = pickProgram(programs, sp.p);
-  if (!prog) return (<><h1>Trilha de ferramentas</h1><div className="card"><p className="empty">Nenhum programa ativo por aqui ainda.</p></div></>);
+  if (!prog) return (<><h1>Começar</h1><div className="card"><p className="empty">Nenhum programa ativo por aqui ainda.</p></div></>);
   const [data, offers] = await Promise.all([listProgramTools(ctx, prog.id), listOffers(ctx, prog.id)]);
   const activeOffers = offers.filter((o) => o.status === "ativa").map((o) => ({ id: o.id, name: o.name }));
 
@@ -48,7 +48,7 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <h1>Trilha de ferramentas</h1>
+      <h1>Começar</h1>
       <p className="sub">Passo a passo das ferramentas do programa. O check é automático: ao concluir a ferramenta, ela é marcada aqui e comprova os itens de portão ligados a ela. Usar as estratégicas eleva o Score de Alavancagem.</p>
       <ProgramPicker programs={programs} current={prog.id} base="/app/ferramentas" />
       {data.tools.length === 0 && <div className="card"><p className="empty">Este programa ainda não tem ferramentas. {data.canEdit ? "Abra o programa e use “Carregar padrões do template”." : ""}</p></div>}
