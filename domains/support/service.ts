@@ -1,9 +1,11 @@
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, or } from "drizzle-orm";
 import { audit } from "@/lib/audit";
 import { type AuthContext, ForbiddenError, isStaff } from "@/lib/authorization";
 import { getDb, schema } from "@/lib/db";
 import { ValidationError } from "@/lib/errors";
-import { type TicketArea, type TicketKind, type TicketStatus, isArea, isKind } from "@/lib/support";
+import { TICKET_KINDS, type TicketArea, type TicketKind, type TicketStatus, isArea, isKind } from "@/lib/support";
+import { sendNotice } from "@/lib/mail";
+import { TICKET_AREAS } from "@/lib/support";
 import { listMentees } from "@/domains/mentees/service";
 
 const clip = (v: string | null | undefined, max: number, label: string) => {
@@ -16,6 +18,45 @@ const clip = (v: string | null | undefined, max: number, label: string) => {
 async function visibleMenteeIds(actor: AuthContext) {
   const rows = await listMentees(actor);
   return new Map(rows.map((m) => [m.id, m.fullName]));
+}
+
+const excerpt = (t: string) => (t.length > 600 ? `${t.slice(0, 600)}…` : t);
+const areaLabel = (a: string) => TICKET_AREAS[a as TicketArea]?.label ?? a;
+
+/** Avisos por e-mail: falha de envio nunca desfaz a ação. */
+async function notify(fn: () => Promise<unknown>) {
+  try {
+    await fn();
+  } catch (e) {
+    console.error("[chamados] aviso por e-mail falhou:", e instanceof Error ? e.message : e);
+  }
+}
+
+/** E-mails da equipe que enxerga o mentorado: administração, direção, mentores atribuídos e mentores com carteira "todos". */
+async function staffEmails(menteeId: string) {
+  const db = await getDb();
+  const links = await db.select({ mentorId: schema.mentorAssignments.mentorId }).from(schema.mentorAssignments).where(eq(schema.mentorAssignments.menteeId, menteeId));
+  const ids = links.map((l) => l.mentorId);
+  const rows = await db
+    .select({ email: schema.users.email })
+    .from(schema.users)
+    .where(
+      and(
+        eq(schema.users.active, true),
+        or(
+          inArray(schema.users.role, ["admin", "direcao"]),
+          and(eq(schema.users.role, "mentor"), eq(schema.users.mentorScope, "all")),
+          ids.length ? inArray(schema.users.id, ids) : undefined,
+        ),
+      ),
+    );
+  return rows.map((r) => r.email);
+}
+
+async function menteeEmail(menteeId: string) {
+  const db = await getDb();
+  const [m] = await db.select({ email: schema.mentees.email, userId: schema.mentees.userId }).from(schema.mentees).where(eq(schema.mentees.id, menteeId)).limit(1);
+  return m?.userId ? m.email : null; // só quem tem acesso ao sistema recebe (precisa entrar para ver a resposta)
 }
 
 export async function createTicket(
@@ -38,6 +79,15 @@ export async function createTicket(
     .values({ menteeId, openedBy: actor.userId, kind: input.kind as TicketKind, area: input.area as TicketArea, title, description: description || null, pagePath })
     .returning();
   await audit({ actorId: actor.userId, entityType: "ticket", entityId: t.id, action: "ticket.create", after: { area: t.area, kind: t.kind } });
+  await notify(async () =>
+    sendNotice({
+      to: await staffEmails(menteeId!),
+      subject: `Novo chamado #${t.number} — ${visible.get(menteeId!) ?? "mentorado"}`,
+      heading: "Novo chamado de ajuda",
+      lines: [`${visible.get(menteeId!) ?? "Mentorado"} · ${areaLabel(t.area)} · ${TICKET_KINDS[t.kind]}`, t.title, ...(t.description ? [excerpt(t.description)] : [])],
+      link: { href: `/app/chamados/${t.id}`, label: "Abrir o chamado" },
+    }),
+  );
   return t;
 }
 
@@ -85,6 +135,17 @@ export async function addMessage(actor: AuthContext, ticketId: string, input: { 
   if (!staff && ticket.status === "resolvido") Object.assign(set, { status: "aberto", resolvedAt: null });
   await db.update(schema.supportTickets).set(set).where(eq(schema.supportTickets.id, ticketId));
   await audit({ actorId: actor.userId, entityType: "ticket", entityId: ticketId, action: "ticket.message", after: { internal: staff && !!input.internal } });
+  if (staff && input.internal) return; // nota interna não avisa ninguém
+  await notify(async () => {
+    if (staff) {
+      const to = await menteeEmail(ticket.menteeId);
+      if (to) await sendNotice({ to: [to], subject: `Resposta ao seu chamado #${ticket.number}`, heading: "A equipe respondeu ao seu chamado", lines: [ticket.title, excerpt(body)], link: { href: `/app/chamados/${ticketId}`, label: "Ver a resposta" } });
+    } else {
+      const db2 = await getDb();
+      const assignee = ticket.assignedTo ? (await db2.select({ email: schema.users.email }).from(schema.users).where(eq(schema.users.id, ticket.assignedTo)).limit(1))[0]?.email : null;
+      await sendNotice({ to: assignee ? [assignee] : await staffEmails(ticket.menteeId), subject: `Nova mensagem no chamado #${ticket.number}`, heading: "O mentorado respondeu ao chamado", lines: [ticket.title, excerpt(body)], link: { href: `/app/chamados/${ticketId}`, label: "Abrir o chamado" } });
+    }
+  });
 }
 
 /** Equipe assume o chamado. */
@@ -100,7 +161,7 @@ export async function assumeTicket(actor: AuthContext, ticketId: string) {
 /** Equipe resolve com a solução (visível ao mentorado e reaproveitada no painel de dúvidas). */
 export async function resolveTicket(actor: AuthContext, ticketId: string, solution: string) {
   if (!isStaff(actor)) throw new ForbiddenError();
-  await getTicket(actor, ticketId);
+  const { ticket } = await getTicket(actor, ticketId);
   const sol = clip(solution, 4000, "A solução");
   if (!sol) throw new ValidationError("Registre a solução/resposta ao resolver.");
   const db = await getDb();
@@ -109,6 +170,10 @@ export async function resolveTicket(actor: AuthContext, ticketId: string, soluti
     .set({ status: "resolvido", solution: sol, resolvedAt: new Date(), assignedTo: actor.userId, updatedAt: new Date() })
     .where(eq(schema.supportTickets.id, ticketId));
   await audit({ actorId: actor.userId, entityType: "ticket", entityId: ticketId, action: "ticket.resolve" });
+  await notify(async () => {
+    const to = await menteeEmail(ticket.menteeId);
+    if (to) await sendNotice({ to: [to], subject: `Chamado #${ticket.number} resolvido`, heading: "Seu chamado foi resolvido", lines: [ticket.title, `Solução:\n${excerpt(sol)}`], link: { href: `/app/chamados/${ticketId}`, label: "Ver o chamado" } });
+  });
 }
 
 export async function reopenTicket(actor: AuthContext, ticketId: string) {

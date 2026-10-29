@@ -81,6 +81,39 @@ async function main() {
   await assert.rejects(() => S.supportPanel(ana), /negado/);
   ok("painel de dúvidas: contagens, áreas e soluções; mentorado não acessa");
 
+  // ── Avisos por e-mail (Resend simulado) ─────────────────────────────────
+  const sent: { to: string; subject: string }[] = [];
+  const realFetch = globalThis.fetch;
+  process.env.RESEND_API_KEY = "re_teste";
+  process.env.EMAIL_FROM = "teste@ex.com";
+  globalThis.fetch = (async (_u: unknown, init: { body: string }) => {
+    sent.push(JSON.parse(init.body));
+    return { ok: true, status: 200 } as Response;
+  }) as unknown as typeof fetch;
+  try {
+    const n = await S.createTicket(ana, { kind: "ajuda", area: "score", title: "Aviso" });
+    const toNew = sent.map((x) => x.to).sort();
+    assert.deepEqual(toNew, ["adm@ex.com", "m1@ex.com"], "novo chamado avisa admin e mentor da carteira (não o mentor de outro mentorado)");
+    sent.length = 0;
+    await S.addMessage(ctx(m1u), n.id, { body: "nota", internal: true });
+    assert.equal(sent.length, 0, "nota interna não envia e-mail");
+    await S.addMessage(ctx(m1u), n.id, { body: "resposta" });
+    assert.deepEqual(sent.map((x) => x.to), ["ana@ex.com"], "resposta da equipe avisa o mentorado");
+    sent.length = 0;
+    await S.addMessage(ana, n.id, { body: "obrigada" });
+    assert.deepEqual(sent.map((x) => x.to), ["m1@ex.com"], "resposta do mentorado avisa quem atende");
+    sent.length = 0;
+    await S.resolveTicket(ctx(m1u), n.id, "pronto");
+    assert.deepEqual(sent.map((x) => x.to), ["ana@ex.com"]);
+    globalThis.fetch = (async () => { throw new Error("rede fora"); }) as unknown as typeof fetch;
+    await S.createTicket(ana, { kind: "ajuda", area: "score", title: "Falha de envio não derruba" });
+  } finally {
+    globalThis.fetch = realFetch;
+    delete process.env.RESEND_API_KEY;
+    delete process.env.EMAIL_FROM;
+  }
+  ok("e-mails: novo chamado, resposta, resolução; nota interna silenciosa; falha de envio não quebra");
+
   await closeDb();
   console.log("\nOK — chamados passaram.");
 }
