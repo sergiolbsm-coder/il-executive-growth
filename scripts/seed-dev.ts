@@ -73,7 +73,7 @@ async function main() {
   await createItem(mc, prog.id, { weekStart: addDays(wk, 7), channel: "linkedin", title: "Estudar fora começa antes do passaporte (exemplo)", axisId: ax2.id, status: "ideia" });
   await addLink(mc, prog.id, { title: "Pasta do programa (exemplo)", url: "https://drive.google.com/drive/folders/exemplo-fictício-1", category: "Drive", pinned: true });
   await addLink(mc, prog.id, { title: "Planilha de KPIs (exemplo)", url: "https://docs.google.com/spreadsheets/d/exemplo-fictício-2/edit", category: "Drive", pinned: true });
-  await addLink(mc, prog.id, { title: "Planner do Líder", url: "https://planner.institutodalideranca.com.br", category: "Ferramentas" });
+  await addLink(mc, prog.id, { title: "Calculadora de precificação", url: "https://exemplo.invalid/precificacao", category: "Ferramentas" });
 
   // Em desenvolvimento, não exige a troca de senha a cada seed
   await (await getDb()).update(schema.users).set({ mustChangePassword: false });

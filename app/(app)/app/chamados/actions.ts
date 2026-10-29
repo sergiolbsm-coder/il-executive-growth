@@ -69,3 +69,24 @@ export async function reopenAction(ticketId: string): Promise<TicketState> {
   revalidatePath("/app/chamados");
   return r === "done" ? undefined : r;
 }
+
+export type QuickTicketState = { error?: string; created?: { id: string; number: number } } | undefined;
+
+/** Abertura pelo pop-up (sem sair da tela): devolve o número do chamado em vez de redirecionar. */
+export async function quickTicketAction(_: QuickTicketState, form: FormData): Promise<QuickTicketState> {
+  const actor = toContext(await requireUser());
+  try {
+    const t = await createTicket(actor, {
+      kind: String(form.get("kind") ?? ""),
+      area: String(form.get("area") ?? ""),
+      title: String(form.get("title") ?? ""),
+      description: String(form.get("description") ?? ""),
+      pagePath: String(form.get("pagePath") ?? "") || null,
+    });
+    revalidatePath("/app/chamados");
+    return { created: { id: t.id, number: t.number } };
+  } catch (e) {
+    if (e instanceof ValidationError || e instanceof ForbiddenError) return { error: e.message };
+    throw e;
+  }
+}

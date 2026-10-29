@@ -135,8 +135,9 @@ async function main() {
   assert.equal(pk.length, 11, "programa recebe os KPIs do template");
   assert.equal(pk.find((k) => k.key === "conexoes")?.weeklyTarget, 20);
   const pt = await T.listProgramTools(ctx(mA), progX.id);
-  assert.equal(pt.tools.length, 12, "programa recebe as 12 ferramentas (11 declarativas + Planner externo)");
-  assert.equal(pt.tools.filter((t) => t.kind === "externa").length, 1);
+  assert.equal(pt.tools.length, 11, "programa recebe as 11 ferramentas declarativas (sem Planner externo)");
+  assert.equal(pt.tools.filter((t) => t.kind === "externa").length, 0);
+  assert.ok(!pt.tools.some((t) => t.slug === "planner-lider"), "link do Planner removido (migração 0011)");
   assert.ok(pt.tools.every((t) => t.best === null));
   ok("programa novo recebe KPIs e ferramentas do template (snapshot)");
 
@@ -273,7 +274,7 @@ async function main() {
   await must(loadTemplateDefaults(ctx(mA), progY.id), "Acesso negado");
   await must(loadTemplateDefaults(ctx(xU), progY.id), "Acesso negado");
   const added = await loadTemplateDefaults(ctx(mB), progY.id);
-  assert.deepEqual(added, { gates: 14, kpis: 11, tools: 12, weights: false });
+  assert.deepEqual(added, { gates: 14, kpis: 11, tools: 11, weights: false });
   assert.deepEqual(await loadTemplateDefaults(ctx(mB), progY.id), { gates: 0, kpis: 0, tools: 0, weights: false }, "idempotente");
   await C.updateProgramKpi(ctx(mB), progY.id, "conexoes", { weeklyTarget: 99 });
   await db.delete(schema.programKpis).where(and(eq(schema.programKpis.programId, progY.id), eq(schema.programKpis.key, "propostas")));
@@ -286,9 +287,8 @@ async function main() {
   await must(T.listToolsAdmin(ctx(mA)), "Acesso negado");
   await must(T.listToolsAdmin(ctx(xU)), "Acesso negado");
   const adm = await T.listToolsAdmin(ctx(dir));
-  assert.equal(adm.tools.length, 12);
+  assert.equal(adm.tools.length, 11);
   assert.deepEqual(adm.tools.find((t) => t.slug === "plano-aquisicao")!.gateKeys.sort(), ["canal-aquisicao", "metas-semanais"]);
-  assert.equal(adm.tools.find((t) => t.slug === "planner-lider")!.kind, "externa");
   assert.ok(adm.tools.every((t) => t.templateIds.includes(base.id)), "template-base inclui todas");
 
   const nt = { slug: "diario-decisoes", name: "Diário de decisões", phase: "transversal" as const, kind: "declarativa" as const, fields: [{ key: "decisao", label: "Decisão", type: "textarea", required: true }], strategic: true, weight: 2 };
@@ -305,16 +305,16 @@ async function main() {
   await T.saveTool(ctx(dir), { ...nt, name: "Diário de decisões v2", weight: 3, gateKeys: ["case"] });
   await must(T.saveTool(ctx(dir), { slug: "diario-decisoes", name: "x", phase: "transversal", kind: "externa", externalUrl: "https://exemplo.com" }), "não pode mudar");
   const adm2 = await T.listToolsAdmin(ctx(admin));
-  assert.equal(adm2.tools.length, 13);
+  assert.equal(adm2.tools.length, 12);
   assert.equal(adm2.tools.find((t) => t.slug === "diario-decisoes")!.name, "Diário de decisões v2");
   assert.deepEqual(adm2.tools.find((t) => t.slug === "diario-decisoes")!.gateKeys, ["case"]);
   assert.equal(adm2.tools.at(-1)!.slug, "diario-decisoes", "nova ferramenta entra no fim");
   // nova ferramenta só aparece em programas novos (cópia) e conforme o template
-  assert.equal((await T.listProgramTools(ctx(mA), progX.id)).tools.length, 12, "programa existente não muda sozinho");
+  assert.equal((await T.listProgramTools(ctx(mA), progX.id)).tools.length, 11, "programa existente não muda sozinho");
   const edu = await deriveTemplate(ctx(dir), base.id, { name: "Educação — Executive", segment: "educacao", model: "executive" });
   assert.equal((await getTemplate(ctx(dir), edu.id)).gates.length, 14);
   const eduTools = (await T.listToolsAdmin(ctx(dir))).tools.filter((t) => t.templateIds.includes(edu.id)).length;
-  assert.equal(eduTools, 12, "derivação copia as ferramentas do template");
+  assert.equal(eduTools, 11, "derivação copia as ferramentas do template");
   await must(T.setTemplateTools(ctx(mA), edu.id, []), "Acesso negado");
   await must(T.setTemplateTools(ctx(dir), edu.id, ["nao-existe"]), "inválida");
   await T.setTemplateTools(ctx(dir), edu.id, ["sintese-profissional", "ficha-oferta", "diario-decisoes"]);
@@ -332,7 +332,10 @@ async function main() {
   assert.equal(pfx.find((t) => t.slug === "ficha-oferta")!.entries.length, 0);
   await must(T.createEntry(ctx(yU), progX.id, "sintese-profissional"), "Acesso negado");
   await must(T.createEntry(ctx(mB), progX.id, "sintese-profissional"), "Acesso negado");
-  await must(T.createEntry(ctx(xU), progX.id, "planner-lider"), "externas");
+  await db.insert(schema.tools).values({ slug: "externa-teste", name: "Externa (teste)", phase: "transversal", kind: "externa", externalUrl: "https://exemplo.com" });
+  await db.insert(schema.programTools).values({ programId: progX.id, toolSlug: "externa-teste" });
+  await must(T.createEntry(ctx(xU), progX.id, "externa-teste"), "externas");
+  await db.delete(schema.tools).where(eq(schema.tools.slug, "externa-teste"));
   await must(T.createEntry(ctx(xU), progX.id, "inexistente"), "não faz parte");
   await must(T.createEntry(ctx(xU), progX.id, "ficha-oferta"), "Escolha a oferta");
   await must(T.createEntry(ctx(xU), progX.id, "ficha-oferta", { offerId: otherOffer.id }), "Oferta inválida");

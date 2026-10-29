@@ -15,6 +15,7 @@ const all: UserRole[] = ["admin", "direcao", "mentor", "mentorado"];
 
 // Novos painéis e ferramentas entram aqui: basta adicionar o item (e a rota).
 export const NAV: NavItem[] = [
+  { label: "Começar", icon: "🧰", href: "/app/ferramentas", roles: all, status: "ready" },
   { label: "Painel", icon: "📊", href: "/app/dashboard", roles: all, status: "ready" },
   { label: "Score de Alavancagem", icon: "🚀", href: "/app/score", roles: all, status: "ready" },
   { label: "Mentorados", icon: "👥", href: "/app/mentorados", roles: staff, status: "ready" },
@@ -25,7 +26,8 @@ export const NAV: NavItem[] = [
   { label: "Sessões e tarefas", icon: "✅", href: "/app/sessoes", roles: all, status: "ready" },
 
   { label: "Pedir ajuda", icon: "🆘", href: "/app/chamados", roles: ["mentorado"], status: "ready" },
-  { label: "Começar", icon: "🧰", href: "/app/ferramentas", roles: all, status: "ready", group: "Ferramentas" },
+  { label: "Calculadora de precificação", icon: "🧮", href: "/app/calculadoras/precificacao", roles: all, status: "ready", group: "Ferramentas" },
+  { label: "Calculadoras de RH", icon: "🧾", href: "/app/calculadoras/rh", roles: all, status: "ready", group: "Ferramentas" },
 
   { label: "Portões a confirmar", icon: "🚪", href: "/app/portoes", roles: staff, status: "ready", group: "Operação" },
   { label: "Chamados e dúvidas", icon: "🆘", href: "/app/chamados", roles: staff, status: "ready", group: "Operação" },
