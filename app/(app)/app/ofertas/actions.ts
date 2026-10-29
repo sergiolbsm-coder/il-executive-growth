@@ -47,7 +47,7 @@ export async function updateOfferAction(offerId: string, _: OfferState, f: FormD
   const r = await guard(() =>
     updateOffer(actor, offerId, {
       name: s(f, "name"), problem: s(f, "problem"), audience: s(f, "audience"), priceNote: s(f, "priceNote"),
-      level: Number(s(f, "level")), wave: optInt(s(f, "wave")), dueDate: s(f, "dueDate") || null, targetStage: Number(s(f, "targetStage")),
+      revenueSlug: s(f, "revenueSlug") || undefined, level: Number(s(f, "level")), wave: optInt(s(f, "wave")), dueDate: s(f, "dueDate") || null, targetStage: Number(s(f, "targetStage")),
     }),
     "Oferta atualizada.");
   refresh(offerId);

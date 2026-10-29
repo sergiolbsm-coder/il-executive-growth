@@ -62,15 +62,21 @@ export function NewOfferForm({ programId, sources }: { programId: string; source
 export function OfferEditForm({
   offerId,
   initial,
+  sources,
 }: {
   offerId: string;
-  initial: { name: string; problem: string; audience: string; priceNote: string | null; level: number; wave: number | null; dueDate: string | null; targetStage: number };
+  sources: { slug: string; name: string; level: number }[];
+  initial: { revenueSlug: string; name: string; problem: string; audience: string; priceNote: string | null; level: number; wave: number | null; dueDate: string | null; targetStage: number };
 }) {
   const [state, action] = useActionState(updateOfferAction.bind(null, offerId), undefined);
   return (
     <form action={action}>
       <label htmlFor="name">Nome</label>
       <input id="name" name="name" defaultValue={initial.name} required />
+      <label htmlFor="revenueSlug">Receita (fonte de receita)</label>
+      <select id="revenueSlug" name="revenueSlug" defaultValue={initial.revenueSlug}>
+        {sources.map((s) => <option key={s.slug} value={s.slug}>{s.name} (nível sugerido {s.level})</option>)}
+      </select>
       <label htmlFor="problem">Problema que resolve</label>
       <textarea id="problem" name="problem" rows={2} defaultValue={initial.problem} required />
       <label htmlFor="audience">Público</label>

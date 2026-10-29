@@ -88,17 +88,18 @@ export async function getOffer(actor: AuthContext, offerId: string) {
   const { offer, program, mentee } = await loadOffer(offerId);
   if (!canViewMentee(actor, toRef(mentee))) throw new ForbiddenError();
   const db = await getDb();
-  const [gates, checks, sales, siblings] = await Promise.all([
+  const [gates, checks, sales, siblings, sources] = await Promise.all([
     db.select().from(schema.programGates).where(eq(schema.programGates.programId, program.id)).orderBy(asc(schema.programGates.stage), asc(schema.programGates.sort)),
     db.select().from(schema.offerGateChecks).where(eq(schema.offerGateChecks.offerId, offerId)),
     db.select().from(schema.sales).where(eq(schema.sales.offerId, offerId)).orderBy(desc(schema.sales.soldAt)),
     db.select({ id: schema.offers.id, name: schema.offers.name }).from(schema.offers).where(eq(schema.offers.programId, program.id)).orderBy(asc(schema.offers.name)),
+    db.select().from(schema.programRevenueSources).where(eq(schema.programRevenueSources.programId, program.id)).orderBy(asc(schema.programRevenueSources.sort)),
   ]);
   const view = derive(offer, gates, checks, sales.length, todayBR());
   const ids = [...new Set([...checks.flatMap((c) => [c.checkedBy, c.confirmedBy]), ...sales.map((s) => s.createdBy)].filter((x): x is string => !!x))];
   const people: Record<string, string> = {};
   if (ids.length) for (const u of await db.select({ id: schema.users.id, name: schema.users.name }).from(schema.users).where(inArray(schema.users.id, ids))) people[u.id] = u.name;
-  return { offer: view, program, mentee, gates, checks, sales, siblings, people, canEdit: canEditProgram(actor, toRef(mentee)) };
+  return { offer: view, program, mentee, gates, checks, sales, siblings, sources, people, canEdit: canEditProgram(actor, toRef(mentee)) };
 }
 
 export interface NewOffer {
@@ -148,12 +149,19 @@ export async function createOffer(actor: AuthContext, programId: string, input: 
   return o;
 }
 
-export type OfferPatch = Partial<Pick<NewOffer, "name" | "problem" | "audience" | "level" | "priceNote" | "wave" | "dueDate" | "targetStage">>;
+export type OfferPatch = Partial<Pick<NewOffer, "name" | "problem" | "audience" | "level" | "priceNote" | "wave" | "dueDate" | "targetStage" | "revenueSlug">>;
 
 export async function updateOffer(actor: AuthContext, offerId: string, patch: OfferPatch) {
   const { offer } = await editableOffer(actor, offerId);
   validateCommon(patch);
   const set: Partial<typeof schema.offers.$inferInsert> = {};
+  // Trocar a receita (fonte de receita) da oferta: precisa existir no catálogo DO PROGRAMA. O estágio, os portões e as vendas não mudam.
+  if (patch.revenueSlug !== undefined && patch.revenueSlug !== offer.revenueSlug) {
+    const db0 = await getDb();
+    const [src] = await db0.select().from(schema.programRevenueSources).where(and(eq(schema.programRevenueSources.programId, offer.programId), eq(schema.programRevenueSources.slug, patch.revenueSlug))).limit(1);
+    if (!src) throw new ValidationError("Receita não encontrada neste programa.");
+    set.revenueSlug = src.slug;
+  }
   if (patch.name !== undefined) set.name = patch.name.trim();
   if (patch.problem !== undefined) set.problem = patch.problem.trim();
   if (patch.audience !== undefined) set.audience = patch.audience.trim();

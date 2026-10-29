@@ -21,7 +21,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
     if (e instanceof ForbiddenError || e instanceof ValidationError) notFound();
     throw e;
   }
-  const { offer, program, mentee, gates, checks, sales, siblings, people, canEdit } = d;
+  const { offer, program, mentee, gates, checks, sales, siblings, sources, people, canEdit } = d;
   const canPropose = user.role === "mentorado";
   const active = offer.status === "ativa";
   const name = (uid: string | null) => (uid ? people[uid] ?? null : null);
@@ -36,7 +36,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
         <span className="stage-chip">Estágio {offer.stage}: {stageName(offer.stage)}</span>{" "}
         <ScheduleBadge status={offer.schedule} />{" "}
         {!active && <span className="badge muted">{offer.status}</span>}{" "}
-        Meta: {stageName(offer.targetStage)}{offer.dueDate ? ` até ${fmtDay(offer.dueDate)}` : ""} · nível {offer.level}{offer.wave ? ` · onda ${offer.wave}` : ""}
+        Receita: {sources.find((x) => x.slug === offer.revenueSlug)?.name ?? offer.revenueSlug} · Meta: {stageName(offer.targetStage)}{offer.dueDate ? ` até ${fmtDay(offer.dueDate)}` : ""} · nível {offer.level}{offer.wave ? ` · onda ${offer.wave}` : ""}
         {offer.priceNote ? ` · ${offer.priceNote}` : ""}
       </p>
       {!active && offer.statusReason && <div className="msg err">Oferta {offer.status}: {offer.statusReason}</div>}
@@ -126,7 +126,8 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
             <h2 className="h2">Editar oferta</h2>
             <OfferEditForm
               offerId={offer.id}
-              initial={{ name: offer.name, problem: offer.problem, audience: offer.audience, priceNote: offer.priceNote, level: offer.level, wave: offer.wave, dueDate: offer.dueDate, targetStage: offer.targetStage }}
+              sources={sources.map((x) => ({ slug: x.slug, name: x.name, level: x.level }))}
+              initial={{ revenueSlug: offer.revenueSlug, name: offer.name, problem: offer.problem, audience: offer.audience, priceNote: offer.priceNote, level: offer.level, wave: offer.wave, dueDate: offer.dueDate, targetStage: offer.targetStage }}
             />
           </div>
           <div className="card">

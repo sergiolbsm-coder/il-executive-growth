@@ -249,6 +249,26 @@ async function main() {
   assert.equal((await O.getOffer(ctx(mA), o2.id)).offer.statusReason, null, "reativar limpa o motivo");
   ok("desmarcar regride; pausar/descartar exigem motivo e bloqueiam marcações e vendas");
 
+  // trocar a receita da oferta
+  const ofBefore = (await O.listOffers(ctx(mA), progX.id)).find((o) => o.id === o2.id)!;
+  assert.equal(ofBefore.revenueSlug, "digitais");
+  await must(O.updateOffer(ctx(mA), o2.id, { revenueSlug: "nao-existe" }), "Receita não encontrada");
+  await must(O.updateOffer(ctx(xU), o2.id, { revenueSlug: "workshops" }), "Acesso negado");
+  await must(O.updateOffer(ctx(mB), o2.id, { revenueSlug: "workshops" }), "Acesso negado");
+  const swapped = await O.updateOffer(ctx(mA), o2.id, { revenueSlug: "instituicoes" });
+  assert.equal(swapped.revenueSlug, "instituicoes");
+  const ofAfter = (await O.listOffers(ctx(mA), progX.id)).find((o) => o.id === o2.id)!;
+  assert.equal(ofAfter.stage, ofBefore.stage, "trocar a receita não muda o estágio");
+  assert.equal(ofAfter.level, ofBefore.level, "nem o nível (que é escolhido à parte)");
+  assert.equal((await O.getOffer(ctx(mA), o2.id)).sources.length, 9, "detalhe devolve o catálogo de receitas do programa");
+  assert.equal(swapped.name, ofBefore.name);
+  const same = await O.updateOffer(ctx(mA), o2.id, { revenueSlug: "instituicoes" });
+  assert.equal(same.revenueSlug, "instituicoes", "repetir a mesma receita é inofensivo");
+  const logSwap = (await db.select().from(schema.activityLog)).filter((l) => l.action === "offer.update" && JSON.stringify(l.afterJson).includes("instituicoes"));
+  assert.ok(logSwap.length >= 1 && JSON.stringify(logSwap[0].beforeJson).includes("digitais"), "auditoria guarda a receita anterior");
+  await O.updateOffer(ctx(mA), o2.id, { revenueSlug: "digitais" });
+  ok("troca da receita da oferta: só equipe, só receitas do programa, estágio preservado, auditada");
+
   // edição da oferta
   const upd = await O.updateOffer(ctx(mA), o2.id, { name: "Toolkit de diagnóstico v2", wave: 2, targetStage: 4, dueDate: addDays(todayBR(), 40), priceNote: "R$ 497" });
   assert.equal(upd.name, "Toolkit de diagnóstico v2");
