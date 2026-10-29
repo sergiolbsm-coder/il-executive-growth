@@ -22,18 +22,18 @@ async function main() {
   const ana = ctx({ id: a.mentee.userId!, role: "mentorado" });
   const bia = ctx({ id: b.mentee.userId!, role: "mentorado" });
 
-  assert.equal(areaFromPath("/app/cadencia"), "cadencia");
+  assert.equal(areaFromPath("/app/ofertas"), "ofertas");
   assert.equal(areaFromPath("/app/ofertas/123"), "ofertas");
   assert.equal(areaFromPath("/app/mentorados/9"), "plano");
   assert.equal(areaFromPath("/qualquer"), "outro");
   ok("área detectada pela tela de origem");
 
   // abertura
-  const t = await S.createTicket(ana, { kind: "duvida", area: "cadencia", title: "  Como lançar KPI? ", description: "não acho", pagePath: "/app/cadencia" });
+  const t = await S.createTicket(ana, { kind: "duvida", area: "score", title: "  Como lançar KPI? ", description: "não acho", pagePath: "/app/cadencia" });
   assert.equal(t.menteeId, a.mentee.id, "mentorado abre sempre no próprio cadastro");
   assert.equal(t.status, "aberto");
   assert.equal(t.title, "Como lançar KPI?");
-  await assert.rejects(() => S.createTicket(ana, { kind: "x", area: "cadencia", title: "t" }), /Tipo/);
+  await assert.rejects(() => S.createTicket(ana, { kind: "x", area: "score", title: "t" }), /Tipo/);
   await assert.rejects(() => S.createTicket(ana, { kind: "ajuda", area: "xx", title: "t" }), /funcionalidade/);
   await assert.rejects(() => S.createTicket(ana, { kind: "ajuda", area: "outro", title: "  " }), /assunto/);
   const hijack = await S.createTicket(ana, { kind: "ajuda", area: "outro", title: "tentando", menteeId: b.mentee.id });

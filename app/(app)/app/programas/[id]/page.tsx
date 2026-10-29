@@ -36,7 +36,6 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
       </p>
 
       <div className="row" style={{ marginBottom: 16 }}>
-        <Link href={`/app/cadencia?p=${program.id}`} className="btn sec">🗓️ Cadência</Link>
         <Link href={`/app/score?p=${program.id}`} className="btn sec">🚀 Score</Link>
         <Link href={`/app/ferramentas?p=${program.id}`} className="btn sec">🧰 Ferramentas</Link>
         <Link href={`/app/conteudo?p=${program.id}`} className="btn sec">✍️ Conteúdo</Link>

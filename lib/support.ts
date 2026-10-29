@@ -17,8 +17,6 @@ export const TICKET_AREAS = {
   plano: { label: "Meu plano / programa", path: "/app/programas" },
   ofertas: { label: "Ofertas e estágios", path: "/app/ofertas" },
   escala: { label: "Escala do Negócio", path: "/app/escala" },
-  cadencia: { label: "Cadência (KPIs e check-in)", path: "/app/cadencia" },
-  comercial: { label: "Comercial (vendas)", path: "/app/comercial" },
   conteudo: { label: "Conteúdo e biblioteca", path: "/app/conteudo" },
   sessoes: { label: "Sessões e tarefas", path: "/app/sessoes" },
   ferramentas: { label: "Ferramentas", path: "/app/ferramentas" },

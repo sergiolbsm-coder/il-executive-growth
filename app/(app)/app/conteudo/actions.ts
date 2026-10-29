@@ -52,7 +52,6 @@ export async function syncKpisAction(programId: string, weekStart: string): Prom
     msg = Object.entries(v).map(([k, n]) => `${k === "posts-linkedin" ? "posts de LinkedIn" : "artigos/newsletter"}: ${n}`).join(" · ");
   });
   if (r?.error) return r;
-  revalidatePath("/app/cadencia");
   return { ok: `KPIs da semana atualizados — ${msg}.` };
 }
 

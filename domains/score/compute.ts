@@ -20,7 +20,7 @@ export const SCORE_HELP: Record<ScoreKey, string> = {
   ferramentas: "Ferramentas do programa concluídas, ponderadas pelo peso de cada uma (as estratégicas pesam o dobro). Revisada pelo mentor vale 100%; concluída sem revisão, 60%; rascunho, 0%.",
   ofertas: "Estágio das ofertas ativas (1–7), ponderado pelo nível da Escala do Negócio: oferta madura num nível alto vale mais.",
   estrutura: "Receitas com oferta (40%), base × topo da pirâmide equilibrados (30%) e vendas com a oferta de origem informada (30%).",
-  tracao: "Vendas (40%, teto em 5), atingimento dos KPIs nas últimas 4 semanas (40%) e check-ins feitos (20%).",
+  tracao: "Vendas registradas (teto em 5).",
 };
 
 /** Normaliza pesos arbitrários para somar exatamente 100 (maior resto). Chaves ausentes ou inválidas viram 0. */
@@ -136,15 +136,9 @@ function estrutura(i: ScoreInput) {
 }
 
 function tracao(i: ScoreInput) {
-  const vendas = clamp01(i.sales.length / 5);
-  const kpi = i.cadence.attainment ?? 0;
-  const chk = clamp01(i.cadence.checkinWeeks / i.cadence.weeks);
   const hints: string[] = [];
   if (i.sales.length < 5) hints.push(i.sales.length === 0 ? "Registre a primeira venda." : "Registre as próximas vendas (teto em 5).");
-  if (i.cadence.attainment == null) hints.push("Configure metas semanais de KPI e lance os valores.");
-  else if (kpi < 1) hints.push("Lance os KPIs da semana e aproxime-se das metas.");
-  if (i.cadence.checkinWeeks < i.cadence.weeks) hints.push("Faça o check-in semanal (PDCA).");
-  return { ratio: clamp01(0.4 * vendas + 0.4 * kpi + 0.2 * chk), hints };
+  return { ratio: clamp01(i.sales.length / 5), hints };
 }
 
 export function computeScore(input: ScoreInput, weightsIn?: Partial<Record<string, number>> | null): ScoreResult {
