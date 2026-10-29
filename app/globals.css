@@ -371,3 +371,13 @@ table.wl.wl-contacts td:nth-child(9) select { min-width: 150px; }
 .entry-field .help { font-size: 11px; color: var(--idl-text-muted); }
 .chk { display: flex; gap: 8px; align-items: center; font-weight: 400; margin: 4px 0; }
 .chk input { width: auto; }
+
+/* Feedback de navegação */
+.nav-progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 1000; overflow: hidden; background: rgba(255,0,96,.15); }
+.nav-progress::before { content: ""; position: absolute; inset: 0; width: 40%; background: var(--idl-magenta);
+  animation: nav-progress-slide 1s ease-in-out infinite; }
+@keyframes nav-progress-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+.page-loading { display: flex; align-items: center; gap: 12px; padding: 48px 24px; color: var(--idl-text-muted); font-weight: 500; }
+.spinner { width: 20px; height: 20px; border-radius: 50%; border: 3px solid var(--idl-border); border-top-color: var(--idl-violet);
+  animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
