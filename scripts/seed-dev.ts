@@ -9,7 +9,7 @@ import { createSession, createTask } from "../domains/sessions/service";
 import { saveCheckin, saveKpiEntries } from "../domains/cadence/service";
 import { createEntry, saveEntry } from "../domains/tools/service";
 import { currentWeek, addDays } from "../lib/week";
-import { addAxis, addLink, createItem } from "../domains/content/service";
+import { addLink } from "../domains/content/service";
 import { listTemplates } from "../domains/templates/service";
 import { createUser } from "../domains/users/service";
 import { generateTempPassword } from "../lib/auth/core";
@@ -65,15 +65,9 @@ async function main() {
   await saveEntry(mc, e2.id, { publico: "Mantenedores" }, false);
 
   // Conteúdo: eixos, calendário e biblioteca (exemplos fictícios)
-  const ax1 = await addAxis(mc, prog.id, { name: "Instituição", description: "Cultura e gestão escolar" });
-  const ax2 = await addAxis(mc, prog.id, { name: "Trajetórias de futuro", description: "Projeto de vida e mobilidade" });
-  await addAxis(mc, prog.id, { name: "Território", description: "Escola e desenvolvimento local" });
-  await createItem(mc, prog.id, { weekStart: addDays(wk, -7), channel: "linkedin", title: "Por que tanta formação termina antes da sala de aula? (exemplo)", axisId: ax1.id, offerId: o1.id, status: "publicada", publishUrl: "https://www.linkedin.com/posts/exemplo", engagement: 180, leads: 1 });
-  await createItem(mc, prog.id, { weekStart: wk, channel: "artigo", title: "O que os espaços da escola denunciam (exemplo)", axisId: ax1.id, status: "rascunho", thesis: "A organização dos espaços materializa crenças sobre poder e autonomia." });
-  await createItem(mc, prog.id, { weekStart: addDays(wk, 7), channel: "linkedin", title: "Estudar fora começa antes do passaporte (exemplo)", axisId: ax2.id, status: "ideia" });
-  await addLink(mc, prog.id, { title: "Pasta do programa (exemplo)", url: "https://drive.google.com/drive/folders/exemplo-fictício-1", category: "Drive", pinned: true });
-  await addLink(mc, prog.id, { title: "Planilha de KPIs (exemplo)", url: "https://docs.google.com/spreadsheets/d/exemplo-fictício-2/edit", category: "Drive", pinned: true });
-  await addLink(mc, prog.id, { title: "Calculadora de precificação", url: "https://exemplo.invalid/precificacao", category: "Ferramentas" });
+  await addLink(mc, prog.id, { title: "Pasta do programa (exemplo)", url: "https://drive.google.com/drive/folders/exemplo-fictício-1", category: "Drive" });
+  await addLink(mc, prog.id, { title: "Planilha de KPIs (exemplo)", url: "https://docs.google.com/spreadsheets/d/exemplo-fictício-2/edit", category: "Drive" });
+  await addLink(mc, prog.id, { title: "Atividade: mapa de ofertas (exemplo)", url: "https://exemplo.invalid/atividade", category: "Atividade" });
 
   // Em desenvolvimento, não exige a troca de senha a cada seed
   await (await getDb()).update(schema.users).set({ mustChangePassword: false });

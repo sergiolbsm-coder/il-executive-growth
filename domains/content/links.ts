@@ -33,3 +33,8 @@ export function detectKind(url: string): LinkKind {
 
 export const KIND_LABEL: Record<LinkKind, string> = { "drive-arquivo": "Drive · arquivo", "drive-pasta": "Drive · pasta", link: "Link" };
 export const KIND_ICON: Record<LinkKind, string> = { "drive-arquivo": "📄", "drive-pasta": "📁", link: "🔗" };
+
+/** Tipos de link da biblioteca (o campo "category" guarda um deles). */
+export const LINK_CATEGORIES = ["Drive", "Atividade", "Assessment"] as const;
+export type LinkCategory = (typeof LINK_CATEGORIES)[number];
+export const isLinkCategory = (v: string): v is LinkCategory => (LINK_CATEGORIES as readonly string[]).includes(v);
