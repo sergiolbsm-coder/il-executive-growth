@@ -21,6 +21,7 @@ export const NAV: NavItem[] = [
   { label: "Mentorados", icon: "👥", href: "/app/mentorados", roles: staff, status: "ready" },
   { label: "Meu plano", icon: "🧭", href: "/app/mentorados", roles: ["mentorado"], status: "ready" },
   { label: "Ofertas", icon: "🧩", href: "/app/ofertas", roles: all, status: "ready" },
+  { label: "Estratégia de vendas", icon: "🎯", href: "/app/estrategia", roles: all, status: "ready" },
   { label: "Escala do Negócio", icon: "🔺", href: "/app/escala", roles: all, status: "ready" },
   { label: "Conteúdo", icon: "✍️", href: "/app/conteudo", roles: all, status: "ready" },
   { label: "Sessões e tarefas", icon: "✅", href: "/app/sessoes", roles: all, status: "ready" },

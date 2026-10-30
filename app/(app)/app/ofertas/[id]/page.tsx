@@ -32,6 +32,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
     <>
       <p className="sub"><Link href={`/app/programas/${program.id}`}>← {program.name}</Link> · {mentee.fullName}</p>
       <h1>{offer.name}</h1>
+      <p className="sub"><Link href={`/app/estrategia?p=${program.id}&o=${offer.id}`}>🎯 Estratégia de vendas desta oferta (quadro do funil)</Link></p>
       <p className="sub">
         <span className="stage-chip">Estágio {offer.stage}: {stageName(offer.stage)}</span>{" "}
         <ScheduleBadge status={offer.schedule} />{" "}

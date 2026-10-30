@@ -407,3 +407,18 @@ table.wl.wl-contacts td:nth-child(9) select { min-width: 150px; }
 .desafio-tag-prazo { background: var(--idl-background-soft); color: var(--idl-text-muted); }
 .help-dialog { border: 1px solid var(--idl-border); border-radius: 16px; padding: 22px 24px; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 48px); overflow-y: auto; color: var(--idl-text); background: #fff; box-shadow: 0 20px 60px rgba(38,16,98,.35); }
 .help-dialog::backdrop { background: rgba(38,16,98,.45); }
+
+/* Estratégia de vendas (kanban por oferta) */
+.kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 10px; align-items: start; }
+.kb-col { background: var(--idl-background-soft); border: 1px solid var(--idl-border); border-radius: var(--r); padding: 10px; min-height: 120px; }
+.kb-head { display: flex; justify-content: space-between; align-items: center; }
+.kb-hint { font-size: 11.5px; color: var(--idl-text-muted); margin: 4px 0 10px; }
+.kb-empty { color: var(--idl-text-muted); text-align: center; margin: 12px 0; }
+.kb-perdido { border-top: 3px solid #E0556F; } .kb-concluido { border-top: 3px solid #1a9e6e; }
+.kb-card { background: #fff; border: 1px solid var(--idl-border); border-radius: var(--r-sm); padding: 10px; margin-bottom: 10px; font-size: 13px; }
+.kb-card p { margin: 6px 0 0; }
+.kb-lbl { font-weight: 700; color: var(--idl-purple); }
+.lessons { margin-top: 10px; border-top: 1px dashed var(--idl-border); padding-top: 8px; }
+.lessons-title { font-weight: 700; font-size: 12px; margin-bottom: 6px; }
+.lesson { background: var(--idl-background-soft); border-radius: 6px; padding: 8px; margin-bottom: 6px; }
+.lesson p { margin: 4px 0 6px; white-space: pre-wrap; }

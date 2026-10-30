@@ -16,6 +16,7 @@ export const TICKET_AREAS = {
   score: { label: "Score de Alavancagem", path: "/app/score" },
   plano: { label: "Meu plano / programa", path: "/app/programas" },
   ofertas: { label: "Ofertas e estágios", path: "/app/ofertas" },
+  estrategia: { label: "Estratégia de vendas", path: "/app/estrategia" },
   escala: { label: "Escala do Negócio", path: "/app/escala" },
   conteudo: { label: "Conteúdo (links, atividades e assessments)", path: "/app/conteudo" },
   sessoes: { label: "Sessões e tarefas", path: "/app/sessoes" },

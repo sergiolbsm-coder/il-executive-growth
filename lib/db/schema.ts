@@ -529,3 +529,38 @@ export const supportMessages = pgTable(
   },
   (t) => [index("support_messages_ticket_idx").on(t.ticketId, t.createdAt)],
 );
+
+export const offerCards = pgTable(
+  "offer_cards",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    offerId: uuid("offer_id").notNull().references(() => offers.id, { onDelete: "cascade" }),
+    kind: text("kind").$type<"cliente" | "demanda">().notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    approach: text("approach"),
+    objection: text("objection"),
+    materialUrl: text("material_url"),
+    priority: text("priority").$type<"alta" | "media" | "baixa">().notNull().default("media"),
+    stage: text("stage").$type<"primeiro_contato" | "apresentacao" | "fechamento" | "aquecimento" | "perdido" | "concluido">().notNull().default("primeiro_contato"),
+    createdBy: uuid("created_by").references(() => users.id),
+    updatedBy: uuid("updated_by").references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("offer_cards_offer_idx").on(t.offerId, t.stage)],
+);
+
+export const offerCardLessons = pgTable(
+  "offer_card_lessons",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    cardId: uuid("card_id").notNull().references(() => offerCards.id, { onDelete: "cascade" }),
+    question: text("question").notNull(),
+    answer: text("answer").notNull(),
+    createdBy: uuid("created_by").references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("offer_card_lessons_card_idx").on(t.cardId, t.createdAt)],
+);
