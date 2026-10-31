@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Calculadoras RH — Instituto da Liderança</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --magenta:#FF0060;--purple:#391694;--purple-dark:#261062;--violet:#4D1DBF;--turq:#00D0C9;
@@ -12,20 +12,22 @@
   --ok:#168D53;--warn:#B45309;--err:#C0152F;--r:12px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex}
-aside{width:250px;background:linear-gradient(160deg,#261062,#391694 70%,#4D1DBF);color:#fff;padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
-aside .brand{display:flex;align-items:center;gap:10px;padding:0 6px 16px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:12px}
+body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 92% -8%,rgba(0,208,201,.14),transparent 38%),radial-gradient(circle at 6% 0,rgba(255,0,96,.07),transparent 34%),var(--bg);background-attachment:fixed;color:var(--text);min-height:100vh;display:flex}
+aside{width:250px;background:#fff;border-right:1px solid var(--border);color:var(--text);padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+aside .brand{display:flex;align-items:center;gap:10px;padding:0 6px 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
 aside .brand img{height:34px}
-aside .brand b{font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.1}
-aside .grp{font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.55;padding:12px 8px 4px}
-aside button{display:block;width:100%;text-align:left;background:none;border:0;color:#fff;font:500 13.5px 'DM Sans';padding:9px 10px;border-radius:8px;cursor:pointer;opacity:.85}
-aside button:hover{background:rgba(255,255,255,.1);opacity:1}
-aside button.on{background:var(--magenta);opacity:1;font-weight:600}
+aside .brand b{font-family:'Manrope',sans-serif;font-size:15px;line-height:1.15;letter-spacing:-.02em;color:var(--purple-dark)}
+aside .grp{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:14px 8px 4px}
+aside button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);font:500 13.5px 'DM Sans';padding:9px 10px;border-radius:10px;cursor:pointer}
+aside button:hover{background:var(--soft);color:var(--purple)}
+aside button.on{background:rgba(255,0,96,.09);color:var(--magenta);font-weight:700}
 main{flex:1;padding:28px 32px;min-width:0}
-h1{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--purple-dark);margin-bottom:4px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:6px 12px;font:700 11px 'DM Sans';letter-spacing:.06em;text-transform:uppercase;color:var(--purple);margin-bottom:12px}
+.eyebrow:before{content:'';width:7px;height:7px;border-radius:50%;background:var(--turq)}
+h1{font-family:'Manrope',sans-serif;font-weight:700;font-size:34px;letter-spacing:-.04em;line-height:1.1;color:var(--text);margin-bottom:6px}
 .sub{color:var(--muted);font-size:14px;margin-bottom:20px;max-width:760px}
-.grid{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:20px;align-items:start}
-.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.grid{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,1fr);gap:20px;align-items:start}
+.card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 22px 60px rgba(57,22,148,.09)}
 .card h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);margin:14px 0 8px}
 .card h3:first-child{margin-top:0}
 label{display:block;font-size:12.5px;font-weight:600;margin:10px 0 4px;color:var(--text)}
@@ -45,10 +47,10 @@ tr.tot td{font-weight:700;border-top:2px solid var(--purple);border-bottom:0;bac
 tr.sec td{font-weight:700;color:var(--purple);background:var(--bg);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
 .neg{color:var(--err)}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
-.kpi{background:var(--soft);border-radius:10px;padding:12px}
+.kpi{background:var(--soft);border-radius:12px;padding:12px 14px}
 .kpi span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.kpi b{font-size:20px;color:var(--purple-dark)}
-.kpi.hl{background:var(--purple-dark);color:#fff}.kpi.hl span{color:rgba(255,255,255,.7)}.kpi.hl b{color:#fff}
+.kpi b{font:800 21px 'Manrope',sans-serif;letter-spacing:-.03em;color:var(--purple-dark)}
+.kpi.hl{background:linear-gradient(145deg,#261062,#391694 70%,#4D1DBF);color:#fff}.kpi.hl span{color:rgba(255,255,255,.7)}.kpi.hl b{color:#fff}
 .note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5}
 .alert{border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:8px;border-left:4px solid}
 .alert.w{background:#FFF7ED;border-color:var(--warn);color:#7C2D12}
@@ -56,14 +58,14 @@ tr.sec td{font-weight:700;color:var(--purple);background:var(--bg);font-size:12p
 .alert.i{background:#F0FDFA;border-color:var(--turq);color:#134E4A}
 .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .actions.topbar{position:sticky;top:0;z-index:5;margin:0 0 12px;padding:8px 0;background:var(--bg)}
-.btn{background:var(--purple);color:#fff;border:0;border-radius:8px;padding:9px 16px;font:600 13px 'DM Sans';cursor:pointer}
-.btn.sec{background:var(--soft);color:var(--purple)}
+.btn{background:var(--magenta);color:#fff;border:0;border-radius:12px;padding:10px 18px;font:700 14px 'DM Sans';cursor:pointer;box-shadow:0 8px 20px rgba(255,0,96,.22)}
+.btn.sec{background:#fff;color:var(--purple);border:1px solid var(--border);box-shadow:none}
 .btn:hover{filter:brightness(1.1)}
 .doc{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:36px 44px;font:14.5px/1.7 Georgia,serif;color:#111}
 .doc .body{white-space:pre-wrap}
 .doc .hd{text-align:center;border-bottom:2px solid var(--purple);padding-bottom:14px;margin-bottom:26px}
 .doc .hd img{max-height:72px;max-width:260px;display:block;margin:0 auto 10px}
-.doc .hd h2{font:700 17px 'DM Sans',sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--purple-dark)}
+.doc .hd h2{font:800 17px 'Manrope',sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--purple-dark)}
 .logoBox{display:flex;align-items:center;gap:10px;margin-top:6px}
 .logoBox img{max-height:44px;max-width:120px;border:1px solid var(--border);border-radius:6px;padding:3px;background:#fff}
 .logoBox .btn{padding:6px 10px;font-size:12px}
@@ -78,7 +80,10 @@ tr.sec td{font-weight:700;color:var(--purple);background:var(--bg);font-size:12p
   aside .brand,aside .grp{width:100%}
   aside button{width:auto}
   main{padding:18px 16px}
-  .grid{grid-template-columns:1fr}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .card{padding:16px}
+  table{display:block;overflow-x:auto}
+  h1{font-size:28px}
   .doc{padding:20px}
 }
 @media print{
@@ -99,6 +104,7 @@ tr.sec td{font-weight:700;color:var(--purple);background:var(--bg);font-size:12p
 <body>
 <aside id="nav"></aside>
 <main>
+  <span class="eyebrow">Calculadoras RH</span>
   <h1 id="ttl"></h1>
   <p class="sub" id="sub"></p>
   <div id="view"></div>
