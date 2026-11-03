@@ -2,7 +2,9 @@
 
 import { useActionState, useState, useTransition } from "react";
 import { SaveState, SubmitButton } from "@/components/ui";
+import Link from "next/link";
 import { STAGES } from "@/lib/stages";
+import type { GateGuide } from "@/lib/stage-guides";
 import {
   checkGateAction, confirmGateAction, createOfferAction, recordSaleAction, removeSaleAction, setStatusAction, uncheckGateAction, updateOfferAction,
   type OfferState,
@@ -142,10 +144,24 @@ export type GateItemProps = {
   canStaff: boolean;
   canPropose: boolean;
   offerActive: boolean;
+  guide?: GateGuide;
 };
 
+/** "Como fazer" de um item: passos, exemplo e o que colar como evidência. */
+function HowTo({ guide }: { guide: GateGuide }) {
+  return (
+    <details className="howto">
+      <summary>Como fazer</summary>
+      <ol>{guide.how.map((h) => <li key={h}>{h}</li>)}</ol>
+      {guide.example && <p className="ex"><b>Exemplo:</b> {guide.example}</p>}
+      <p className="ex"><b>Evidência:</b> {guide.evidence}</p>
+      {guide.tool && <p className="ex"><Link href="/app/ferramentas">Abrir a ferramenta que ajuda a preencher →</Link></p>}
+    </details>
+  );
+}
+
 /** Um item de portão: aberto (com evidência), pendente (aguarda equipe) ou confirmado. Portões de vendas são automáticos. */
-export function GateItem({ offerId, gate, check, salesCount, canStaff, canPropose, offerActive }: GateItemProps) {
+export function GateItem({ offerId, gate, check, salesCount, canStaff, canPropose, offerActive, guide }: GateItemProps) {
   const [state, action] = useActionState(checkGateAction.bind(null, offerId, gate.key), undefined);
   const [pending, start] = useTransition();
   const [res, setRes] = useState<OfferState>();
@@ -161,6 +177,7 @@ export function GateItem({ offerId, gate, check, salesCount, canStaff, canPropos
         <div className="body">
           <div>{gate.label} {optional && <span className="opt">(opcional)</span>}</div>
           <div className="ev">{salesCount} de {need} venda(s) registrada(s) — calculado automaticamente</div>
+          {guide && <HowTo guide={guide} />}
         </div>
       </div>
     );
@@ -171,6 +188,7 @@ export function GateItem({ offerId, gate, check, salesCount, canStaff, canPropos
       <span className="mark">{check ? (check.state === "confirmado" ? "✅" : "⏳") : "◻️"}</span>
       <div className="body">
         <div>{gate.label} {optional && <span className="opt">(opcional)</span>}</div>
+        {guide && <HowTo guide={guide} />}
         {check && (
           <div className="ev">
             {check.state === "pendente" ? "Aguardando confirmação da equipe · " : "Confirmado · "}

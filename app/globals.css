@@ -422,3 +422,10 @@ table.wl.wl-contacts td:nth-child(9) select { min-width: 150px; }
 .lessons-title { font-weight: 700; font-size: 12px; margin-bottom: 6px; }
 .lesson { background: var(--idl-background-soft); border-radius: 6px; padding: 8px; margin-bottom: 6px; }
 .lesson p { margin: 4px 0 6px; white-space: pre-wrap; }
+
+.stage-guide, .howto { margin: 8px 0; font-size: 13px; }
+.stage-guide { background: var(--idl-soft, #f4f0fb); border-radius: 10px; padding: 10px 14px; }
+.stage-guide summary, .howto summary { cursor: pointer; font-weight: 600; color: var(--idl-purple-dark); }
+.stage-guide ol, .howto ol { margin: 6px 0 6px 18px; padding: 0; }
+.stage-guide p, .howto .ex { margin: 6px 0; }
+.howto { margin: 2px 0 6px; }

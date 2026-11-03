@@ -8,6 +8,7 @@ import { ValidationError } from "@/lib/errors";
 import { fmtBRL, fmtDateTime, fmtDay } from "@/lib/format";
 import { STAGES, stageName } from "@/lib/stages";
 import { ScheduleBadge, StageBar } from "@/components/StageBar";
+import { GATE_GUIDES, STAGE_GUIDES } from "@/lib/stage-guides";
 import { GateItem, OfferEditForm, RemoveSaleButton, SaleForm, StatusForm } from "../forms";
 
 export default async function OfferPage({ params }: { params: Promise<{ id: string }> }) {
@@ -70,6 +71,14 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
               {st.n}. {st.name} <span className="badge muted">{st.phase}</span>{" "}
               {reached ? <span className="stage-chip sch-cumprida">alcançado</span> : offer.stage + 1 === st.n ? <span className="stage-chip">próximo</span> : null}
             </h3>
+            {STAGE_GUIDES[st.n] && (
+              <details className="stage-guide" open={offer.stage + 1 === st.n}>
+                <summary>O que fazer nesta etapa</summary>
+                <p><b>Objetivo:</b> {STAGE_GUIDES[st.n].goal}</p>
+                <ol>{STAGE_GUIDES[st.n].steps.map((x) => <li key={x}>{x}</li>)}</ol>
+                <p><b>Você sai com:</b> {STAGE_GUIDES[st.n].deliverable}</p>
+              </details>
+            )}
             {list.length === 0 ? (
               <p className="empty">Nenhum portão configurado para este estágio.</p>
             ) : (
@@ -85,6 +94,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                     canStaff={canEdit}
                     canPropose={canPropose}
                     offerActive={active}
+                    guide={GATE_GUIDES[g.key]}
                   />
                 );
               })
