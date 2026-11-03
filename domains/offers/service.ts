@@ -149,6 +149,26 @@ export async function createOffer(actor: AuthContext, programId: string, input: 
   return o;
 }
 
+/** Importa ofertas coladas em lote para o programa. Valida TUDO antes; nomes já existentes no programa são pulados (reimportar é seguro). */
+export async function importOffers(actor: AuthContext, programId: string, text: string, apply: boolean) {
+  const { mentee } = await loadProgram(programId);
+  if (!canEditProgram(actor, toRef(mentee))) throw new ForbiddenError();
+  const { parseOfferTable } = await import("./import");
+  const { offers, errors } = parseOfferTable(text ?? "");
+  if (errors.length) throw new ValidationError(`Nada foi importado. Corrija:\n${errors.slice(0, 8).join("\n")}${errors.length > 8 ? `\n…e mais ${errors.length - 8}` : ""}`);
+  if (!offers.length) throw new ValidationError("Nenhuma oferta encontrada no texto colado.");
+  if (offers.length > 120) throw new ValidationError("No máximo 120 ofertas por importação.");
+  const db = await getDb();
+  const slugs = new Set((await db.select({ s: schema.programRevenueSources.slug }).from(schema.programRevenueSources).where(eq(schema.programRevenueSources.programId, programId))).map((r) => r.s));
+  const missing = [...new Set(offers.filter((o) => !slugs.has(o.revenueSlug)).map((o) => o.revenueSlug))];
+  if (missing.length) throw new ValidationError(`Este programa não tem as receitas: ${missing.join(", ")}.`);
+  const have = new Set((await db.select({ n: schema.offers.name }).from(schema.offers).where(eq(schema.offers.programId, programId))).map((r) => r.n.trim().toLowerCase()));
+  const fresh = offers.filter((o) => !have.has(o.name.trim().toLowerCase()));
+  const skipped = offers.filter((o) => have.has(o.name.trim().toLowerCase())).map((o) => o.name);
+  if (apply) for (const o of fresh) await createOffer(actor, programId, o);
+  return { total: offers.length, created: fresh.length, skipped, applied: apply };
+}
+
 export type OfferPatch = Partial<Pick<NewOffer, "name" | "problem" | "audience" | "level" | "priceNote" | "wave" | "dueDate" | "targetStage" | "revenueSlug">>;
 
 export async function updateOffer(actor: AuthContext, offerId: string, patch: OfferPatch) {

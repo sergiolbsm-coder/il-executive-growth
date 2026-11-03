@@ -6,7 +6,7 @@ import Link from "next/link";
 import { STAGES } from "@/lib/stages";
 import type { GateGuide } from "@/lib/stage-guides";
 import {
-  checkGateAction, confirmGateAction, createOfferAction, recordSaleAction, removeSaleAction, setStatusAction, uncheckGateAction, updateOfferAction,
+  checkGateAction, confirmGateAction, createOfferAction, importOffersAction, recordSaleAction, removeSaleAction, setStatusAction, uncheckGateAction, updateOfferAction,
   type OfferState,
 } from "./actions";
 
@@ -23,6 +23,24 @@ function Feedback({ state }: { state: OfferState }) {
 const stageOptions = STAGES.map((s) => (
   <option key={s.n} value={s.n}>{s.n}. {s.name}</option>
 ));
+
+/** Cola a tabela de ofertas (Excel/Docs) e importa em lote; "Conferir" não grava nada. */
+export function ImportOffersForm({ programId }: { programId: string }) {
+  const [state, action] = useActionState(importOffersAction.bind(null, programId), undefined);
+  return (
+    <form action={action}>
+      <p className="sub">Cole as linhas da planilha de importação (colunas: Receita · Nome · Problema · Público · Meta · Prazo · Onda · Preço, com o cabeçalho). Também vale a tabela agrupada por <b>Receita N — …</b>. Ofertas com o mesmo nome são puladas.</p>
+      <p className="sub"><a href="/api/modelos/importacao-ofertas" download>⬇️ Baixar o modelo da planilha (.xlsx)</a> — traz as instruções e listas de escolha; dá para preenchê-lo à mão ou no chat.</p>
+      <textarea name="text" rows={8} required placeholder="Cole aqui as linhas copiadas da planilha" aria-label="Tabela de ofertas" />
+      <div className="row" style={{ marginTop: 8 }}>
+        <SubmitButton className="btn sec" name="mode" value="check" pendingLabel="Conferindo…">Conferir</SubmitButton>
+        <SubmitButton name="mode" value="apply" pendingLabel="Importando…">Importar</SubmitButton>
+      </div>
+      {state?.error && <div className="msg err" style={{ whiteSpace: "pre-line" }}>{state.error}</div>}
+      {state?.ok && <div className="msg ok">{state.ok}</div>}
+    </form>
+  );
+}
 
 export function NewOfferForm({ programId, sources }: { programId: string; sources: { slug: string; name: string; level: number }[] }) {
   const [state, action] = useActionState(createOfferAction.bind(null, programId), undefined);

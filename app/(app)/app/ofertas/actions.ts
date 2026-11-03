@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { checkGate, confirmGate, createOffer, recordSale, removeSale, setOfferStatus, uncheckGate, updateOffer } from "@/domains/offers/service";
+import { checkGate, confirmGate, createOffer, importOffers, recordSale, removeSale, setOfferStatus, uncheckGate, updateOffer } from "@/domains/offers/service";
 import { ForbiddenError } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { ValidationError } from "@/lib/errors";
@@ -101,4 +101,20 @@ export async function removeSaleAction(offerId: string, saleId: string): Promise
   const r = await guard(() => removeSale(actor, saleId));
   refresh(offerId);
   return r;
+}
+
+export async function importOffersAction(programId: string, _: OfferState, f: FormData): Promise<OfferState> {
+  const actor = toContext(await requireUser());
+  const apply = s(f, "mode") === "apply";
+  let msg = "";
+  const r = await guard(async () => {
+    const out = await importOffers(actor, programId, s(f, "text"), apply);
+    msg = apply
+      ? `${out.created} oferta(s) importada(s)${out.skipped.length ? `; ${out.skipped.length} já existia(m) e foi(ram) pulada(s)` : ""}.`
+      : `Conferido: ${out.total} oferta(s) no texto — ${out.created} nova(s)${out.skipped.length ? `, ${out.skipped.length} já existente(s) (serão puladas)` : ""}. Se estiver certo, clique em Importar.`;
+  });
+  if (r) return r;
+  revalidatePath(`/app/programas/${programId}`);
+  revalidatePath("/app/ofertas");
+  return { ok: msg };
 }

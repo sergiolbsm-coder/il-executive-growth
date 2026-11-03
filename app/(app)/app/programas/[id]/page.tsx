@@ -9,7 +9,7 @@ import { fmtDay } from "@/lib/format";
 import { Meters, ProgramMap } from "@/components/ProgramMap";
 import { ScheduleBadge, StageBar } from "@/components/StageBar";
 import { stageName } from "@/lib/stages";
-import { NewOfferForm } from "../../ofertas/forms";
+import { ImportOffersForm, NewOfferForm } from "../../ofertas/forms";
 import { LoadDefaultsButton, ProgramForm } from "./form";
 
 export default async function ProgramPage({ params }: { params: Promise<{ id: string }> }) {
@@ -81,6 +81,13 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
         <div className="card">
           <h2 className="h2">Nova oferta</h2>
           <NewOfferForm programId={program.id} sources={sources.map((x) => ({ slug: x.slug, name: x.name, level: x.level }))} />
+        </div>
+      )}
+
+      {canEdit && (
+        <div className="card">
+          <h2 className="h2">Importar ofertas em lote</h2>
+          <ImportOffersForm programId={program.id} />
         </div>
       )}
 
