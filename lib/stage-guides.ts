@@ -193,3 +193,81 @@ export const GATE_GUIDES: Record<string, GateGuide> = {
     evidence: "Informe a meta (valor e prazo).",
   },
 };
+
+/** Exemplos por tipo de oferta (fonte de receita da oferta); sem exemplo específico, vale o genérico do portão. */
+const EX: Record<string, Record<string, string>> = {
+  "ficha-1-pagina": {
+    autoridade: "Público: gestores que querem referência em liderança. Problema: 'tenho resultado, mas ninguém sabe'. Formato: conteúdo semanal + 1 palestra aberta por trimestre.",
+    workshops: "Público: gestores de primeira viagem em PMEs. Problema: 'viro o bombeiro do time'. Formato: workshop de 4h, até 20 pessoas.",
+    digitais: "Público: RHs de empresas pequenas. Problema: 'não tenho modelo pronto de avaliação'. Formato: kit de planilhas e roteiros para baixar.",
+    cursos: "Público: profissionais em transição de carreira. Problema: 'não sei como me apresentar'. Formato: curso online de 4 módulos, 6 horas.",
+    recorrencia: "Público: empreendedoras solo. Problema: 'trabalho sozinha e travo'. Formato: comunidade com encontro mensal e plantão de dúvidas.",
+    instituicoes: "Público: diretores de escolas. Problema: 'equipe desmotivada e rotatividade alta'. Formato: programa de 3 meses com a equipe gestora.",
+    "alto-valor": "Público: donos de empresa de 20 a 100 pessoas. Problema: 'a empresa depende de mim'. Formato: mentoria individual de 6 meses.",
+    parcerias: "Público: consultorias que querem adicionar liderança ao portfólio. Formato: licença do método com formação dos consultores.",
+    conselhos: "Público: empresas familiares em sucessão. Problema: 'decisões travadas entre gerações'. Formato: participação em reunião trimestral de conselho.",
+  },
+  preco: {
+    autoridade: "Palestra aberta paga por ingresso (R$ 150) ou cachê por convite (R$ 3.000); o objetivo é gerar contatos, então defina a meta de leads por evento.",
+    workshops: "Workshop de 4h para 20 pessoas: R$ 4.000 por turma, com custo de R$ 900 e margem de 77%.",
+    digitais: "Kit a R$ 97 com custo quase zero por unidade; calcule quantas vendas por mês cobrem seu tempo de criação.",
+    cursos: "Curso de R$ 497 à vista ou 12x; considere taxa da plataforma e do cartão (cerca de 10%) antes de calcular a margem.",
+    recorrencia: "Mensalidade de R$ 89; defina o ponto de equilíbrio (quantos membros pagam seu tempo e a plataforma) e a taxa de saída esperada.",
+    instituicoes: "Projeto por escopo: R$ 18.000 por 3 meses, com horas de preparo, deslocamento e imposto na conta; considere o ciclo de pagamento da instituição.",
+    "alto-valor": "Mentoria de 6 meses a R$ 12.000 (R$ 2.000 por mês); cobre menos clientes com mais tempo por cliente, então defina o limite de vagas.",
+    parcerias: "Licença anual por consultor (R$ 6.000) + percentual por projeto vendido; defina o que o parceiro paga e o que você entrega.",
+    conselhos: "Retainer mensal de R$ 3.500 por empresa, com reuniões e disponibilidade combinadas por contrato.",
+  },
+  pitch: {
+    autoridade: "'Todo mês eu ajudo gestores a destravar o time. Posso te mandar um conteúdo e você me diz se faz sentido conversarmos?'",
+    workshops: "'Seus líderes passam o dia apagando incêndio. Em 4 horas, eles saem com um plano para delegar. Posso te mandar a proposta até sexta?'",
+    digitais: "'Em 10 minutos você usa o modelo e já tem a avaliação pronta. Quer testar a versão de amostra?'",
+    cursos: "'Em 6 horas, você sai com seu discurso profissional pronto e treinado. A primeira aula é gratuita; quer ver?'",
+    recorrencia: "'Aqui você não trabalha sozinha: uma vez por mês nos reunimos e cada uma sai com uma ação. Entre e participe do próximo encontro.'",
+    instituicoes: "'Sua equipe gestora tem alta rotatividade. Em 3 meses, trabalhamos o clima e a liderança com meta e indicadores. Posso apresentar o escopo à direção?'",
+    "alto-valor": "'Se a empresa para quando você sai, o negócio é um emprego. Em 6 meses, construímos o time e os processos para isso mudar. Vamos conversar 30 minutos?'",
+    parcerias: "'Você já vende consultoria. Com o nosso método licenciado, você adiciona liderança ao portfólio sem criar do zero.'",
+    conselhos: "'Decisões importantes ficam travadas na família. Um conselho trimestral traz neutralidade e acompanhamento. Posso participar de uma reunião como convidado?'",
+  },
+  "material-entrega": {
+    autoridade: "Roteiro de palestra, slides e um material de apoio (checklist) para entregar à plateia em troca do contato.",
+    workshops: "Slides, roteiro minuto a minuto, atividades impressas e lista de presença.",
+    digitais: "O produto em si (planilhas, modelos), um guia rápido de uso e a página de entrega.",
+    cursos: "Aulas gravadas, apostila, exercícios e a trilha na plataforma; grave o módulo 1 primeiro.",
+    recorrencia: "Calendário de encontros do trimestre, pauta padrão e regras da comunidade.",
+    instituicoes: "Plano do programa por mês, instrumentos de diagnóstico e modelo de relatório para a direção.",
+    "alto-valor": "Pasta do mentorado, modelo de plano de ação, calendário de sessões e planilha de acompanhamento.",
+    parcerias: "Manual do método, treinamento dos parceiros, kit de materiais e regras de uso da marca.",
+    conselhos: "Pauta-padrão de reunião, relatório de acompanhamento e modelo de ata.",
+  },
+  "canal-aquisicao": {
+    autoridade: "LinkedIn: 3 conteúdos por semana e 10 conexões qualificadas por dia, convidando os mais engajados para uma conversa.",
+    workshops: "Contato direto com RHs e entidades de classe: 5 mensagens por semana oferecendo uma turma-piloto.",
+    digitais: "Distribuição de uma amostra gratuita em redes e listas, com página de captura e acompanhamento por e-mail.",
+    cursos: "Aula experimental ao vivo para a rede de contatos e convite ao final.",
+    recorrencia: "Convite pessoal para as 20 primeiras pessoas e indicação das fundadoras.",
+    instituicoes: "Relacionamento com diretores e mantenedoras; peça apresentação por quem já é cliente.",
+    "alto-valor": "Indicação: peça a 5 clientes antigos que apresentem um dono de empresa que passa pelo mesmo problema.",
+    parcerias: "Lista de 10 consultorias complementares e uma conversa de 20 minutos com cada uma.",
+    conselhos: "Contadores, advogados e bancos que atendem empresas familiares e podem indicar.",
+  },
+  "metas-semanais": {
+    autoridade: "3 publicações, 10 conexões qualificadas e 2 conversas com quem interagiu.",
+    workshops: "5 abordagens, 2 reuniões e 1 proposta de turma por semana.",
+    digitais: "100 pessoas alcançadas com a amostra, 10 downloads e 1 venda por semana.",
+    cursos: "1 aula ao vivo por mês, 30 inscritos e 3 matrículas por turma.",
+    recorrencia: "3 convites por semana e 1 novo membro por semana.",
+    instituicoes: "2 conversas com diretores e 1 apresentação de escopo por mês (o ciclo é mais longo).",
+    "alto-valor": "2 pedidos de indicação, 1 reunião e 1 proposta por semana (poucas contas, alto valor).",
+    parcerias: "2 conversas com parceiros e 1 proposta de piloto por mês.",
+    conselhos: "1 conversa com um indicador por semana e 1 apresentação por mês.",
+  },
+};
+
+/** Exemplo do portão adaptado ao tipo de oferta (slug da fonte de receita); cai no exemplo genérico. */
+export function guideFor(gateKey: string, revenueSlug: string): GateGuide | undefined {
+  const g = GATE_GUIDES[gateKey];
+  if (!g) return undefined;
+  const ex = EX[gateKey]?.[revenueSlug];
+  return ex ? { ...g, example: ex } : g;
+}

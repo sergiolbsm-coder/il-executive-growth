@@ -8,7 +8,7 @@ import { ValidationError } from "@/lib/errors";
 import { fmtBRL, fmtDateTime, fmtDay } from "@/lib/format";
 import { STAGES, stageName } from "@/lib/stages";
 import { ScheduleBadge, StageBar } from "@/components/StageBar";
-import { GATE_GUIDES, STAGE_GUIDES } from "@/lib/stage-guides";
+import { guideFor, STAGE_GUIDES } from "@/lib/stage-guides";
 import { GateItem, OfferEditForm, RemoveSaleButton, SaleForm, StatusForm } from "../forms";
 
 export default async function OfferPage({ params }: { params: Promise<{ id: string }> }) {
@@ -94,7 +94,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                     canStaff={canEdit}
                     canPropose={canPropose}
                     offerActive={active}
-                    guide={GATE_GUIDES[g.key]}
+                    guide={guideFor(g.key, offer.revenueSlug)}
                   />
                 );
               })
