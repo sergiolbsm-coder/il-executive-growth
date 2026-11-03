@@ -24,8 +24,9 @@ export const STAGE_GUIDES: Record<number, StageGuide> = {
       "Escreva o problema com as palavras que o cliente usa, não as suas.",
       "Descreva a solução e o formato (palestra, workshop, consultoria, programa…).",
       "Defina como você vai testar se existe interesse real.",
+      "Opcional: monte um protótipo para mostrar ao cliente (apresentação, formulário, assessment, site ou MVP).",
     ],
-    deliverable: "Ficha de 1 página da oferta.",
+    deliverable: "Ficha de 1 página da oferta (e, se quiser, um protótipo).",
   },
   3: {
     goal: "Deixar a oferta pronta para ser vendida: preço, discurso, proposta e material para entregar.",
@@ -84,6 +85,7 @@ export const GATE_GUIDES: Record<string, GateGuide> = {
       "Solução e proposta de valor: o que muda para ele depois de contratar você.",
       "Formato: palestra, workshop, consultoria, curso ou programa; duração e entrega.",
       "Hipótese de validação: com quem vai conversar e o que precisa ouvir para confirmar o interesse.",
+      "Protótipo (opcional): algo que o cliente possa ver ou usar. Apresentação comercial e formulário são os mais rápidos; assessment ou site, se a oferta pede; MVP só para produto digital.",
     ],
     example: "Público: gestores de primeira viagem em PMEs. Problema: 'viro o bombeiro do time e não sobra tempo para liderar'. Hipótese: 3 de 5 gestores abordados querem uma conversa.",
     evidence: "Cole o texto da ficha ou o link do documento.",
