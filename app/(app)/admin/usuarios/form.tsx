@@ -8,12 +8,12 @@ export function NewUserForm() {
   const [state, action] = useActionState(createUserAction, undefined);
   const [role, setRole] = useState("mentor");
   return (
-    <form action={action} className="card">
+    <form autoComplete="off" action={action} className="card">
       <h2 className="h2">Liberar novo acesso</h2>
       <label htmlFor="name">Nome</label>
-      <input id="name" name="name" required />
+      <input autoComplete="off" id="name" name="name" required />
       <label htmlFor="email">E-mail</label>
-      <input id="email" name="email" type="email" required />
+      <input autoComplete="off" id="email" name="email" type="email" required />
       <label htmlFor="role">Perfil</label>
       <select id="role" name="role" value={role} onChange={(e) => setRole(e.target.value)}>
         <option value="mentor">Mentor</option>
@@ -31,7 +31,7 @@ export function NewUserForm() {
         </>
       )}
       <label htmlFor="password">Senha provisória (opcional — vazio gera uma)</label>
-      <input id="password" name="password" type="text" minLength={8} autoComplete="off" />
+      <input id="password" name="password" type="text" minLength={8} autoComplete="new-password" />
       {state?.error && <div className="msg err">{state.error}</div>}
       {state?.ok && <div className="msg ok">{state.ok} {state.tempPassword && <code className="pw">{state.tempPassword}</code>}</div>}
       <SubmitButton pendingLabel="Criando…">Liberar acesso</SubmitButton>
@@ -53,9 +53,9 @@ export function RowActions({ id, active, self, role, scope, name, email }: { id:
   return (
     <div>
       {editing && (
-        <form action={save} style={{ marginBottom: 8 }}>
-          <input name="name" defaultValue={name} aria-label="Nome" required />
-          <input name="email" type="email" defaultValue={email} aria-label="E-mail" required />
+        <form autoComplete="off" action={save} style={{ marginBottom: 8 }}>
+          <input autoComplete="off" name="name" defaultValue={name} aria-label="Nome" required />
+          <input autoComplete="off" name="email" type="email" defaultValue={email} aria-label="E-mail" required />
           <div className="row">
             <button className="btn" disabled={pending}>Salvar</button>
             <button type="button" className="btn sec" disabled={pending} onClick={() => setEditing(false)}>Cancelar</button>

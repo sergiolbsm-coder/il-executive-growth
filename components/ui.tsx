@@ -9,7 +9,7 @@ export function Spinner({ size = 14 }: { size?: number }) {
 
 /**
  * Botão de envio com feedback: mostra spinner + rótulo "Salvando…" e uma barra de progresso enquanto a
- * ação do servidor roda, e fica desabilitado para evitar clique duplo. Use dentro de <form action={…}>.
+ * ação do servidor roda, e fica desabilitado para evitar clique duplo. Use dentro de <form autoComplete="off" action={…}>.
  */
 export function SubmitButton({
   children,

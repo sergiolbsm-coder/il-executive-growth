@@ -8,7 +8,7 @@ import { assumeAction, createTicketAction, reopenAction, replyAction, resolveAct
 export function NewTicketForm({ mentees, defaultArea, pagePath }: { mentees: { id: string; name: string }[]; defaultArea: TicketArea; pagePath: string }) {
   const [state, action] = useActionState(createTicketAction, undefined);
   return (
-    <form action={action} className="card">
+    <form autoComplete="off" action={action} className="card">
       <input type="hidden" name="pagePath" value={pagePath} />
       {mentees.length > 0 && (
         <>
@@ -40,7 +40,7 @@ export function NewTicketForm({ mentees, defaultArea, pagePath }: { mentees: { i
 export function ReplyForm({ ticketId, staff }: { ticketId: string; staff: boolean }) {
   const [state, action] = useActionState(replyAction.bind(null, ticketId), undefined);
   return (
-    <form action={action} key={state?.ok ?? "new"}>
+    <form autoComplete="off" action={action} key={state?.ok ?? "new"}>
       <label htmlFor="body">Responder</label>
       <textarea id="body" name="body" rows={4} maxLength={4000} required />
       {staff && (
@@ -58,7 +58,7 @@ export function ReplyForm({ ticketId, staff }: { ticketId: string; staff: boolea
 export function ResolveForm({ ticketId }: { ticketId: string }) {
   const [state, action] = useActionState(resolveAction.bind(null, ticketId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <label htmlFor="solution">Solução / resposta final (o mentorado vê e fica no painel de soluções)</label>
       <textarea id="solution" name="solution" rows={4} maxLength={4000} required />
       {state?.error && <div className="msg err">{state.error}</div>}

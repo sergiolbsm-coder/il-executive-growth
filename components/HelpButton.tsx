@@ -47,7 +47,7 @@ export function HelpButton() {
             </div>
           </div>
         ) : (
-          <form action={action} key={round}>
+          <form autoComplete="off" action={action} key={round}>
             <h2 className="h2">Preciso de ajuda</h2>
             <p className="sub" style={{ marginTop: 0 }}>Anote agora, sem sair da tela: a equipe recebe também a página em que você estava.</p>
             <input type="hidden" name="pagePath" value={pathname} />

@@ -13,9 +13,9 @@ export function ProgramForm({
 }) {
   const [state, action] = useActionState(updateProgramAction.bind(null, programId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <label htmlFor="name">Nome do programa</label>
-      <input id="name" name="name" defaultValue={initial.name} required />
+      <input autoComplete="off" id="name" name="name" defaultValue={initial.name} required />
       <label htmlFor="purpose">Propósito (topo da Escala do Negócio)</label>
       <input id="purpose" name="purpose" defaultValue={initial.purpose ?? ""} />
       <div className="row">

@@ -17,7 +17,7 @@ function Feedback({ state }: { state: ScoreState }) {
 export function WeightsForm({ programId, weights, labels }: { programId: string; weights: Record<string, number>; labels: Record<string, string> }) {
   const [state, action] = useActionState(updateWeightsAction.bind(null, programId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <div className="kgrid">
         {Object.keys(labels).map((k) => (
           <div key={k}><label htmlFor={`w-${k}`}>{labels[k]}</label><input id={`w-${k}`} name={k} inputMode="numeric" defaultValue={weights[k]} /></div>
@@ -32,7 +32,7 @@ export function WeightsForm({ programId, weights, labels }: { programId: string;
 export function SnapshotButton({ programId }: { programId: string }) {
   const [state, action] = useActionState(snapshotAction.bind(null, programId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <Feedback state={state} />
       <SubmitButton className="btn sec">Registrar o retrato desta semana</SubmitButton>
     </form>

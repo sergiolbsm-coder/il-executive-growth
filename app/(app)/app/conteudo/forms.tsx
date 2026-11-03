@@ -20,7 +20,7 @@ const categoryOptions = LINK_CATEGORIES.map((c) => <option key={c} value={c}>{c}
 export function NewLinkForm({ programId }: { programId: string }) {
   const [state, action] = useActionState(addLinkAction.bind(null, programId), undefined);
   return (
-    <form action={action} key={state?.ok ?? "new"}>
+    <form autoComplete="off" action={action} key={state?.ok ?? "new"}>
       <div className="row">
         <div style={{ flex: 2, minWidth: 220 }}><label htmlFor="lt">Título</label><input id="lt" name="title" required /></div>
         <div style={{ flex: 1, minWidth: 160 }}>
@@ -78,7 +78,7 @@ export function LinkActions({ link }: { link: { id: string; title: string; url: 
       </div>
       <details style={{ marginTop: 6 }}>
         <summary style={{ cursor: "pointer", fontSize: 12 }}>Editar</summary>
-        <form action={action}>
+        <form autoComplete="off" action={action}>
           <label>Título</label><input name="title" defaultValue={link.title} required />
           <label>Endereço</label><input name="url" type="url" defaultValue={link.url} required />
           <label>Tipo</label><select name="category" defaultValue={link.category ?? ""}><option value="">Automático</option>{categoryOptions}</select>

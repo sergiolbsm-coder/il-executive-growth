@@ -19,7 +19,7 @@ function Feedback({ state }: { state: SessState }) {
 export function NewSessionForm({ programs, today }: { programs: Prog[]; today: string }) {
   const [state, action] = useActionState(createSessionAction, undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <div className="row">
         <div style={{ flex: 2, minWidth: 220 }}>
           <label htmlFor="sp">Programa</label>
@@ -45,7 +45,7 @@ export function NewTaskForm({ programs, sessions }: { programs: Prog[]; sessions
   const [state, action] = useActionState(createTaskAction, undefined);
   const [prog, setProg] = useState(programs[0]?.id ?? "");
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <div className="row">
         <div style={{ flex: 2, minWidth: 220 }}>
           <label htmlFor="tp">Programa</label>

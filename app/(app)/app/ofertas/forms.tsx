@@ -28,7 +28,7 @@ const stageOptions = STAGES.map((s) => (
 export function ImportOffersForm({ programId }: { programId: string }) {
   const [state, action] = useActionState(importOffersAction.bind(null, programId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <p className="sub">Cole as linhas da planilha de importação (colunas: Receita · Nome · Problema · Público · Meta · Prazo · Onda · Preço, com o cabeçalho). Também vale a tabela agrupada por <b>Receita N — …</b>. Ofertas com o mesmo nome são puladas.</p>
       <p className="sub"><a href="/api/modelos/importacao-ofertas" download>⬇️ Baixar o modelo da planilha (.xlsx)</a> — traz as instruções e listas de escolha; dá para preenchê-lo à mão ou no chat.</p>
       <textarea name="text" rows={8} required placeholder="Cole aqui as linhas copiadas da planilha" aria-label="Tabela de ofertas" />
@@ -45,14 +45,14 @@ export function ImportOffersForm({ programId }: { programId: string }) {
 export function NewOfferForm({ programId, sources }: { programId: string; sources: { slug: string; name: string; level: number }[] }) {
   const [state, action] = useActionState(createOfferAction.bind(null, programId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <p className="sub">Toda oferta nasce em <b>Ideia</b>: informe a receita, o problema que resolve e o público.</p>
       <label htmlFor="revenueSlug">Receita (fonte de receita)</label>
       <select id="revenueSlug" name="revenueSlug" required>
         {sources.map((s) => <option key={s.slug} value={s.slug}>{s.name} (nível {s.level})</option>)}
       </select>
       <label htmlFor="name">Nome da oferta</label>
-      <input id="name" name="name" required />
+      <input autoComplete="off" id="name" name="name" required />
       <label htmlFor="problem">Problema que resolve</label>
       <textarea id="problem" name="problem" rows={2} required />
       <label htmlFor="audience">Público</label>
@@ -90,9 +90,9 @@ export function OfferEditForm({
 }) {
   const [state, action] = useActionState(updateOfferAction.bind(null, offerId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <label htmlFor="name">Nome</label>
-      <input id="name" name="name" defaultValue={initial.name} required />
+      <input autoComplete="off" id="name" name="name" defaultValue={initial.name} required />
       <label htmlFor="revenueSlug">Receita (fonte de receita)</label>
       <select id="revenueSlug" name="revenueSlug" defaultValue={initial.revenueSlug}>
         {sources.map((s) => <option key={s.slug} value={s.slug}>{s.name} (nível sugerido {s.level})</option>)}
@@ -131,7 +131,7 @@ export function StatusForm({ offerId, status }: { offerId: string; status: strin
   const [state, action] = useActionState(setStatusAction.bind(null, offerId), undefined);
   const [choice, setChoice] = useState(status === "ativa" ? "pausada" : "ativa");
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <div className="row" style={{ alignItems: "flex-end" }}>
         <div style={{ minWidth: 160 }}>
           <label htmlFor="status">Situação</label>
@@ -223,7 +223,7 @@ export function GateItem({ offerId, gate, check, salesCount, canStaff, canPropos
           </div>
         )}
         {!check && offerActive && (canStaff || canPropose) && (
-          <form action={action} className="inline">
+          <form autoComplete="off" action={action} className="inline">
             <input name="evidence" placeholder="Evidência (texto ou link)" required minLength={3} aria-label={`Evidência: ${gate.label}`} />
             <SubmitButton className="btn sec" pendingLabel="Salvando…">{canStaff ? "Marcar" : "Enviar p/ confirmação"}</SubmitButton>
           </form>
@@ -237,7 +237,7 @@ export function GateItem({ offerId, gate, check, salesCount, canStaff, canPropos
 export function SaleForm({ offerId, siblings, today }: { offerId: string; siblings: { id: string; name: string }[]; today: string }) {
   const [state, action] = useActionState(recordSaleAction.bind(null, offerId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <div className="row">
         <div style={{ flex: 2, minWidth: 180 }}><label htmlFor="clientName">Cliente</label><input id="clientName" name="clientName" required /></div>
         <div style={{ flex: 1, minWidth: 120 }}><label htmlFor="value">Valor (R$)</label><input id="value" name="value" inputMode="decimal" placeholder="2.500,00" required /></div>

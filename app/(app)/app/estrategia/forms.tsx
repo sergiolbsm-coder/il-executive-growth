@@ -50,7 +50,7 @@ function CardFieldsForm({ initial }: { initial?: CardFields }) {
 export function NewCardForm({ offerId }: { offerId: string }) {
   const [state, action] = useActionState(createCardAction.bind(null, offerId), undefined);
   return (
-    <form action={action} key={state?.ok ?? "new"}>
+    <form autoComplete="off" action={action} key={state?.ok ?? "new"}>
       <div style={{ maxWidth: 260 }}>
         <label htmlFor="ns">Em qual etapa do funil usar</label>
         <select id="ns" name="stage" defaultValue="primeiro_contato">{FUNNEL_STAGES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}</select>
@@ -82,7 +82,7 @@ export function CardActions({ card }: { card: CardFields & { id: string; stage: 
       </div>
       <details style={{ marginTop: 6 }}>
         <summary style={{ cursor: "pointer", fontSize: 12 }}>Editar</summary>
-        <form action={action}>
+        <form autoComplete="off" action={action}>
           <CardFieldsForm initial={card} />
           <Feedback state={state} />
           <div className="row">
@@ -118,7 +118,7 @@ export function Lessons({ cardId, stage, lessons }: { cardId: string; stage: str
       {lessons.map((l) => (
         <div key={l.id} className="lesson">
           {editing === l.id ? (
-            <form action={editAction}>
+            <form autoComplete="off" action={editAction}>
               <input type="hidden" name="id" value={l.id} />
               <input name="question" defaultValue={l.question} maxLength={300} required />
               <textarea name="answer" rows={3} defaultValue={l.answer} maxLength={2000} required />
@@ -141,7 +141,7 @@ export function Lessons({ cardId, stage, lessons }: { cardId: string; stage: str
       {canHaveLessons(stage) && (
         <details>
           <summary style={{ cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Registrar lição</summary>
-          <form action={action} key={state?.ok ?? "new"}>
+          <form autoComplete="off" action={action} key={state?.ok ?? "new"}>
             <label>Pergunta</label>
             <select name="questionPick" value={pick} onChange={(e) => setPick(e.target.value)} required>
               <option value="" disabled>Escolha uma pergunta…</option>

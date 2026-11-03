@@ -23,13 +23,13 @@ export function ToolEditor({ v }: { v: ToolFormValue }) {
   const [state, action] = useActionState(saveToolAction, undefined);
   const [kind, setKind] = useState(v.kind);
   return (
-    <form action={action} key={v.slug || "novo"}>
+    <form autoComplete="off" action={action} key={v.slug || "novo"}>
       <div className="row">
         <div style={{ flex: 1, minWidth: 200 }}>
           <label htmlFor="slug">Identificador (não muda depois)</label>
           <input id="slug" name="slug" defaultValue={v.slug} readOnly={!v.isNew} required placeholder="ex.: diario-decisoes" />
         </div>
-        <div style={{ flex: 2, minWidth: 240 }}><label htmlFor="name">Nome</label><input id="name" name="name" defaultValue={v.name} required /></div>
+        <div style={{ flex: 2, minWidth: 240 }}><label htmlFor="name">Nome</label><input autoComplete="off" id="name" name="name" defaultValue={v.name} required /></div>
       </div>
       <div className="row">
         <div style={{ flex: 1, minWidth: 180 }}>
@@ -75,7 +75,7 @@ export function ToolEditor({ v }: { v: ToolFormValue }) {
 export function TemplateToolsForm({ templateId, tools, selected }: { templateId: string; tools: { slug: string; name: string; active: boolean }[]; selected: string[] }) {
   const [state, action] = useActionState(setTemplateToolsAction.bind(null, templateId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <div className="kgrid">
         {tools.map((t) => (
           <label key={t.slug} className="chk"><input type="checkbox" name="tools" value={t.slug} defaultChecked={selected.includes(t.slug)} /> {t.name}{!t.active && <span className="badge muted">inativa</span>}</label>

@@ -19,7 +19,7 @@ function Feedback({ state }: { state: ToolState }) {
 export function NewEntryForm({ programId, slug, offers, needsOffer }: { programId: string; slug: string; offers: { id: string; name: string }[]; needsOffer: boolean }) {
   const [state, action] = useActionState(createEntryAction.bind(null, programId, slug), undefined);
   return (
-    <form action={action} className="row" style={{ alignItems: "flex-end" }}>
+    <form autoComplete="off" action={action} className="row" style={{ alignItems: "flex-end" }}>
       {(needsOffer || offers.length > 0) && (
         <div style={{ minWidth: 200 }}>
           <label htmlFor={`o-${slug}`}>Oferta{needsOffer ? " (obrigatória)" : " (opcional)"}</label>
@@ -40,7 +40,7 @@ export function NewEntryForm({ programId, slug, offers, needsOffer }: { programI
 export function EntryForm({ entryId, fields, data }: { entryId: string; fields: ToolField[]; data: Record<string, unknown> }) {
   const [state, action] = useActionState(saveEntryAction.bind(null, entryId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       {fields.map((f) => {
         const id = `f-${f.key}`;
         const v = data[f.key];
@@ -93,7 +93,7 @@ export function ReviewButton({ entryId }: { entryId: string }) {
 export function StartButton({ programId, slug, offerId, label = "Começar" }: { programId: string; slug: string; offerId?: string; label?: string }) {
   const [state, action] = useActionState(createEntryAction.bind(null, programId, slug), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       {offerId && <input type="hidden" name="offerId" value={offerId} />}
       <SubmitButton className="btn sec" pendingLabel="Abrindo…">{label}</SubmitButton>
       {state?.error && <div className="msg err">{state.error}</div>}

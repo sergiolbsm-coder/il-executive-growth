@@ -24,12 +24,12 @@ function Feedback({ state }: { state: MenteeState }) {
 export function NewMenteeForm({ mentors }: { mentors: Mentor[] }) {
   const [state, action] = useActionState(createMenteeAction, undefined);
   return (
-    <form action={action} className="card">
+    <form autoComplete="off" action={action} className="card">
       <h2 className="h2">Novo mentorado</h2>
       <label htmlFor="fullName">Nome completo</label>
-      <input id="fullName" name="fullName" required />
+      <input autoComplete="off" id="fullName" name="fullName" required />
       <label htmlFor="email">E-mail</label>
-      <input id="email" name="email" type="email" />
+      <input autoComplete="off" id="email" name="email" type="email" />
       <label htmlFor="segment">Segmento (ex.: educação, finanças, saúde)</label>
       <input id="segment" name="segment" />
       <label>Mentores</label>
@@ -53,7 +53,7 @@ export function NewMenteeForm({ mentors }: { mentors: Mentor[] }) {
 export function AssignMentorsForm({ menteeId, mentors, selected }: { menteeId: string; mentors: Mentor[]; selected: string[] }) {
   const [state, action] = useActionState(assignMentorsAction.bind(null, menteeId), undefined);
   return (
-    <form action={action}>
+    <form autoComplete="off" action={action}>
       <div className="scope-list">
         {mentors.map((m) => (
           <label key={m.id} style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 400 }}>
@@ -70,7 +70,7 @@ export function AssignMentorsForm({ menteeId, mentors, selected }: { menteeId: s
 export function NewProgramForm({ menteeId, templates }: { menteeId: string; templates: Template[] }) {
   const [state, action] = useActionState(createProgramAction.bind(null, menteeId), undefined);
   return (
-    <form action={action} className="card">
+    <form autoComplete="off" action={action} className="card">
       <h2 className="h2">Abrir programa</h2>
       <p className="sub">O programa recebe uma <b>cópia</b> do catálogo e da pirâmide do template; mudar o template depois não altera este programa.</p>
       <label htmlFor="templateId">Template</label>
@@ -80,7 +80,7 @@ export function NewProgramForm({ menteeId, templates }: { menteeId: string; temp
         ))}
       </select>
       <label htmlFor="name">Nome do programa</label>
-      <input id="name" name="name" required />
+      <input autoComplete="off" id="name" name="name" required />
       <label htmlFor="model">Modelo (Smart, Executive, Master, Advisory, Impulso… — vazio usa o do template)</label>
       <input id="model" name="model" />
       <label htmlFor="purpose">Propósito (topo da Escala do Negócio)</label>
@@ -100,12 +100,12 @@ export function NewProgramForm({ menteeId, templates }: { menteeId: string; temp
 export function EditMenteeForm({ menteeId, initial, hasAccess }: { menteeId: string; initial: { fullName: string; email: string | null; segment: string | null }; hasAccess: boolean }) {
   const [state, action] = useActionState(updateMenteeAction.bind(null, menteeId), undefined);
   return (
-    <form action={action} className="card">
+    <form autoComplete="off" action={action} className="card">
       <h2 className="h2">Corrigir dados do mentorado</h2>
       <label htmlFor="fullName">Nome completo</label>
-      <input id="fullName" name="fullName" defaultValue={initial.fullName} required />
+      <input autoComplete="off" id="fullName" name="fullName" defaultValue={initial.fullName} required />
       <label htmlFor="email">E-mail{hasAccess ? " (também é o login)" : ""}</label>
-      <input id="email" name="email" type="email" defaultValue={initial.email ?? ""} required={hasAccess} />
+      <input autoComplete="off" id="email" name="email" type="email" defaultValue={initial.email ?? ""} required={hasAccess} />
       <label htmlFor="segment">Segmento</label>
       <input id="segment" name="segment" defaultValue={initial.segment ?? ""} />
       <Feedback state={state} />

@@ -66,7 +66,7 @@ export function Sidebar({ items, user }: { items: NavItem[]; user: { name: strin
             <span className="user-name">{user.name}</span>
             <span className="user-role">{ROLE_LABEL[user.role] ?? user.role}</span>
           </span>
-          <form action={logoutAction}>
+          <form autoComplete="off" action={logoutAction}>
             <button className="user-exit" title="Sair" aria-label="Sair">🚪</button>
           </form>
         </div>
