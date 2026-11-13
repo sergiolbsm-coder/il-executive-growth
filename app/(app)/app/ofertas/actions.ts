@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { checkGate, confirmGate, createOffer, importOffers, recordSale, removeSale, setOfferStatus, uncheckGate, updateOffer } from "@/domains/offers/service";
+import { buildOfferPrompt, importOfferAnswers } from "@/domains/offers/answers";
 import { ForbiddenError } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { ValidationError } from "@/lib/errors";
@@ -116,5 +117,28 @@ export async function importOffersAction(programId: string, _: OfferState, f: Fo
   if (r) return r;
   revalidatePath(`/app/programas/${programId}`);
   revalidatePath("/app/ofertas");
+  return { ok: msg };
+}
+
+export async function offerPromptAction(offerId: string): Promise<{ text?: string; error?: string }> {
+  const actor = toContext(await requireUser());
+  try {
+    return { text: await buildOfferPrompt(actor, offerId) };
+  } catch (e) {
+    if (e instanceof ValidationError || e instanceof ForbiddenError) return { error: e.message };
+    throw e;
+  }
+}
+
+export async function importAnswersAction(offerId: string, _: OfferState, f: FormData): Promise<OfferState> {
+  const actor = toContext(await requireUser());
+  const apply = s(f, "mode") === "apply";
+  let msg = "";
+  const r = await guard(async () => {
+    const out = await importOfferAnswers(actor, offerId, s(f, "text"), apply);
+    msg = `${apply ? "Importado" : "Conferido"}: ${out.tools} ferramenta(s) e ${out.items} item(ns).\n${out.report.join("\n")}${apply ? "\nO mentor vai revisar e confirmar." : "\nSe estiver certo, clique em Importar."}`;
+  });
+  if (r) return r;
+  refresh(offerId);
   return { ok: msg };
 }

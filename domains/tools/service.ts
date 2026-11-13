@@ -230,7 +230,7 @@ export interface SaveResult { status: "rascunho" | "concluida"; marked: string[]
  * Salva a entrada. Com `conclude`, exige os campos obrigatórios e COMPROVA os itens de portão ligados à ferramenta na oferta
  * (equipe: confirmado; mentorado: pendente). Qualquer alteração limpa a revisão anterior.
  */
-export async function saveEntry(actor: AuthContext, entryId: string, data: Record<string, unknown>, conclude: boolean): Promise<SaveResult> {
+export async function saveEntry(actor: AuthContext, entryId: string, data: Record<string, unknown>, conclude: boolean, opts: { pending?: boolean } = {}): Promise<SaveResult> {
   const { entry, tool, linkedGates } = await getEntry(actor, entryId);
   if (tool.kind !== "declarativa") throw new ValidationError("Ferramenta externa não tem entradas.");
   const clean = validateEntryData(tool.fields, data, conclude);
@@ -241,7 +241,7 @@ export async function saveEntry(actor: AuthContext, entryId: string, data: Recor
   if (conclude && entry.offerId) {
     for (const g of linkedGates) {
       try {
-        await checkGate(actor, entry.offerId, g.key, `Ferramenta "${tool.name}" concluída (entrada ${entry.id}).`);
+        await checkGate(actor, entry.offerId, g.key, `Ferramenta "${tool.name}" concluída (entrada ${entry.id}).${opts.pending ? " Preenchida a partir da resposta da IA do assessorado — revisar." : ""}`, { pending: opts.pending });
         marked.push(g.key);
       } catch (e) {
         if (e instanceof ValidationError) warnings.push(`${g.label}: ${e.message}`);

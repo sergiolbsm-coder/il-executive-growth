@@ -222,7 +222,8 @@ async function gateOf(programId: string, key: string) {
  * Marca um item de portão com evidência. Equipe: já fica CONFIRMADO. Mentorado (o próprio): fica PENDENTE até a equipe confirmar.
  * Portões de vendas não se marcam: são calculados pelas vendas registradas.
  */
-export async function checkGate(actor: AuthContext, offerId: string, gateKey: string, evidence: string) {
+/** `pending`: mesmo a equipe grava como PENDENTE (proposta a revisar) — usado nas respostas geradas por IA. */
+export async function checkGate(actor: AuthContext, offerId: string, gateKey: string, evidence: string, opts: { pending?: boolean } = {}) {
   const { offer, program, mentee } = await loadOffer(offerId);
   const staff = canEditProgram(actor, toRef(mentee));
   const own = actor.role === "mentorado" && canViewMentee(actor, toRef(mentee));
@@ -236,11 +237,12 @@ export async function checkGate(actor: AuthContext, offerId: string, gateKey: st
 
   const db = await getDb();
   const [existing] = await db.select().from(schema.offerGateChecks).where(and(eq(schema.offerGateChecks.offerId, offerId), eq(schema.offerGateChecks.gateKey, gateKey))).limit(1);
-  if (existing?.state === "confirmado" && !staff) throw new ValidationError("Este item já foi confirmado pela equipe.");
-  const state = staff ? "confirmado" : "pendente";
+  const direct = staff && !opts.pending;
+  if (existing?.state === "confirmado" && !direct) throw new ValidationError("Este item já foi confirmado pela equipe.");
+  const state = direct ? "confirmado" : "pendente";
   const values = {
     evidence: ev, state, checkedBy: actor.userId, checkedAt: new Date(),
-    confirmedBy: staff ? actor.userId : null, confirmedAt: staff ? new Date() : null,
+    confirmedBy: direct ? actor.userId : null, confirmedAt: direct ? new Date() : null,
   } as const;
   if (existing) await db.update(schema.offerGateChecks).set(values).where(eq(schema.offerGateChecks.id, existing.id));
   else await db.insert(schema.offerGateChecks).values({ offerId, gateKey, ...values });

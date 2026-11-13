@@ -6,7 +6,7 @@ import Link from "next/link";
 import { STAGES } from "@/lib/stages";
 import type { GateGuide } from "@/lib/stage-guides";
 import {
-  checkGateAction, confirmGateAction, createOfferAction, importOffersAction, recordSaleAction, removeSaleAction, setStatusAction, uncheckGateAction, updateOfferAction,
+  checkGateAction, confirmGateAction, createOfferAction, importAnswersAction, importOffersAction, offerPromptAction, recordSaleAction, removeSaleAction, setStatusAction, uncheckGateAction, updateOfferAction,
   type OfferState,
 } from "./actions";
 
@@ -39,6 +39,46 @@ export function ImportOffersForm({ programId }: { programId: string }) {
       {state?.error && <div className="msg err" style={{ whiteSpace: "pre-line" }}>{state.error}</div>}
       {state?.ok && <div className="msg ok">{state.ok}</div>}
     </form>
+  );
+}
+
+/** Gera o prompt da oferta inteira para a IA do assessorado e importa a resposta (tudo entra como pendente de revisão). */
+export function AiCompleteForm({ offerId }: { offerId: string }) {
+  const [prompt, setPrompt] = useState<string>();
+  const [err, setErr] = useState<string>();
+  const [copied, setCopied] = useState(false);
+  const [busy, start] = useTransition();
+  const [state, action] = useActionState(importAnswersAction.bind(null, offerId), undefined);
+  const gen = () => start(async () => {
+    const r = await offerPromptAction(offerId);
+    setErr(r.error);
+    setPrompt(r.text);
+    setCopied(false);
+  });
+  const copy = async () => {
+    if (!prompt) return;
+    try { await navigator.clipboard.writeText(prompt); setCopied(true); } catch { setErr("Não consegui copiar automaticamente: selecione o texto e copie."); }
+  };
+  return (
+    <div>
+      <p className="sub"><b>1.</b> Gere o prompt desta oferta e cole na sua IA (ChatGPT, Claude, Gemini…), no mesmo chat em que você já conversa sobre o seu negócio. <b>2.</b> Cole aqui a resposta dela. Tudo entra como <b>pendente</b>: o mentor revisa e confirma.</p>
+      <div className="row">
+        <button type="button" className="btn sec" disabled={busy} onClick={gen}>{busy ? "Gerando…" : prompt ? "Gerar de novo" : "Gerar prompt"}</button>
+        {prompt && <button type="button" className="btn sec" onClick={copy}>{copied ? "✅ Copiado" : "Copiar prompt"}</button>}
+      </div>
+      {err && <div className="msg err">{err}</div>}
+      {prompt && <textarea readOnly rows={10} value={prompt} aria-label="Prompt para a sua IA" onFocus={(e) => e.currentTarget.select()} />}
+      <form autoComplete="off" action={action} style={{ marginTop: 10 }}>
+        <label htmlFor="ai-answer">Resposta da sua IA (cole o bloco JSON)</label>
+        <textarea id="ai-answer" name="text" rows={6} required placeholder='{ "versao": 1, "oferta": "…", "ferramentas": { … }, "itens": { … } }' />
+        <div className="row" style={{ marginTop: 8 }}>
+          <SubmitButton className="btn sec" name="mode" value="check" pendingLabel="Conferindo…">Conferir</SubmitButton>
+          <SubmitButton name="mode" value="apply" pendingLabel="Importando…">Importar</SubmitButton>
+        </div>
+        {state?.error && <div className="msg err" style={{ whiteSpace: "pre-line" }}>{state.error}</div>}
+        {state?.ok && <div className="msg ok" style={{ whiteSpace: "pre-line" }}>{state.ok}</div>}
+      </form>
+    </div>
   );
 }
 

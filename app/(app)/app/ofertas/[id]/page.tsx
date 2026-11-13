@@ -9,7 +9,7 @@ import { fmtBRL, fmtDateTime, fmtDay } from "@/lib/format";
 import { STAGES, stageName } from "@/lib/stages";
 import { ScheduleBadge, StageBar } from "@/components/StageBar";
 import { guideFor, STAGE_GUIDES } from "@/lib/stage-guides";
-import { GateItem, OfferEditForm, RemoveSaleButton, SaleForm, StatusForm } from "../forms";
+import { AiCompleteForm, GateItem, OfferEditForm, RemoveSaleButton, SaleForm, StatusForm } from "../forms";
 
 export default async function OfferPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -55,6 +55,15 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
         {offer.stage === 7 && <p className="sub" style={{ margin: "14px 0 0" }}>Oferta em escala. 🎉</p>}
         {offer.pendingChecks > 0 && <p className="sub" style={{ margin: "10px 0 0" }}>⏳ {offer.pendingChecks} item(ns) aguardando confirmação da equipe.</p>}
       </div>
+
+      {active && (canEdit || canPropose) && (
+        <div className="card">
+          <details>
+            <summary style={{ cursor: "pointer", fontWeight: 600 }}>✨ Completar a oferta inteira com a minha IA</summary>
+            <AiCompleteForm offerId={offer.id} />
+          </details>
+        </div>
+      )}
 
       <div className="card">
         <h2 className="h2">Ideia (estágio 1)</h2>
