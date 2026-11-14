@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmButton } from "@/components/ConfirmButton";
 import { useActionState, useState, useTransition } from "react";
 import { SaveState, SubmitButton } from "@/components/ui";
 import { createUserAction, resetPasswordAction, setScopeAction, toggleActiveAction, updateUserAction, type GrantState } from "./actions";
@@ -32,8 +33,8 @@ export function NewUserForm() {
       )}
       <label htmlFor="password">Senha provisória (opcional — vazio gera uma)</label>
       <input id="password" name="password" type="text" minLength={8} autoComplete="new-password" />
-      {state?.error && <div className="msg err">{state.error}</div>}
-      {state?.ok && <div className="msg ok">{state.ok} {state.tempPassword && <code className="pw">{state.tempPassword}</code>}</div>}
+      {state?.error && <div role="alert" className="msg err">{state.error}</div>}
+      {state?.ok && <div role="status" className="msg ok">{state.ok} {state.tempPassword && <code className="pw">{state.tempPassword}</code>}</div>}
       <SubmitButton pendingLabel="Criando…">Liberar acesso</SubmitButton>
     </form>
   );
@@ -64,7 +65,7 @@ export function RowActions({ id, active, self, role, scope, name, email }: { id:
       )}
       <div className="row">
         {!editing && <button className="btn sec" disabled={pending} onClick={() => setEditing(true)}>Editar nome/e-mail</button>}
-        <button className="btn sec" disabled={pending} onClick={() => confirm("Gerar nova senha provisória e encerrar as sessões deste usuário?") && run(() => resetPasswordAction(id))}>Redefinir senha</button>
+        <ConfirmButton className="btn sec" disabled={pending} message="Gerar nova senha provisória e encerrar as sessões deste usuário?" confirmLabel="Redefinir senha" onConfirm={() => run(() => resetPasswordAction(id))}>Redefinir senha</ConfirmButton>
         {!self && (
           <button className="btn sec" disabled={pending} onClick={() => run(() => toggleActiveAction(id, !active))}>{active ? "Desativar" : "Reativar"}</button>
         )}
@@ -82,7 +83,7 @@ export function RowActions({ id, active, self, role, scope, name, email }: { id:
         )}
         <SaveState pending={pending} ok={res?.ok} error={res?.error} />
       </div>
-      {res?.tempPassword && <div className="msg ok">Senha provisória: <code className="pw">{res.tempPassword}</code></div>}
+      {res?.tempPassword && <div role="status" className="msg ok">Senha provisória: <code className="pw">{res.tempPassword}</code></div>}
     </div>
   );
 }

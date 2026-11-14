@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { listOffers } from "@/domains/offers/service";
@@ -11,6 +12,9 @@ import { ScheduleBadge, StageBar } from "@/components/StageBar";
 import { stageName } from "@/lib/stages";
 import { ImportOffersForm, NewOfferForm } from "../../ofertas/forms";
 import { LoadDefaultsButton, ProgramForm } from "./form";
+
+
+export const metadata: Metadata = { title: "Programa" };
 
 export default async function ProgramPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -42,25 +46,29 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
         <Link href="/app/sessoes" className="btn sec">✅ Sessões e tarefas</Link>
       </div>
 
+      <nav className="toc" aria-label="Nesta página">
+        <a href="#mapa">Mapa</a><a href="#ofertas">Ofertas</a>{canEdit && <a href="#nova">Nova oferta</a>}<a href="#escala">Escala do Negócio</a>{canEdit && <a href="#editar">Editar programa</a>}
+      </nav>
+
       <div className="card">
         <h2 className="h2">Propósito</h2>
         <p style={{ fontSize: 18, margin: 0 }}>{program.purpose ?? <span className="empty">Ainda não definido.</span>}</p>
       </div>
 
-      <div className="card">
+      <div className="card" id="mapa">
         <h2 className="h2">Mapa das receitas</h2>
         <p className="sub">Cada oferta na coluna do seu estágio; receitas sem oferta aparecem como lacuna. Meta de abril: 9 estruturadas, 4–5 validadas, 2–3 em escala.</p>
         <Meters sources={sources} offers={offers} />
         <ProgramMap sources={sources} levels={levels} offers={offers} />
       </div>
 
-      <div className="card">
+      <div className="card" id="ofertas">
         <h2 className="h2">Ofertas ({offers.length})</h2>
         {offers.length === 0 ? (
           <p className="empty">Nenhuma oferta ainda.{canEdit ? " Crie a primeira abaixo." : ""}</p>
         ) : (
           <table>
-            <thead><tr><th>Oferta</th><th>Receita</th><th style={{ width: 180 }}>Ciclo</th><th>Estágio</th><th>Meta / prazo</th><th>Vendas</th></tr></thead>
+            <thead><tr><th scope="col">Oferta</th><th scope="col">Receita</th><th scope="col" style={{ width: 180 }}>Ciclo</th><th scope="col">Estágio</th><th scope="col">Meta / prazo</th><th scope="col">Vendas</th></tr></thead>
             <tbody>
               {offers.map((o) => (
                 <tr key={o.id} style={o.status !== "ativa" ? { opacity: 0.6 } : undefined}>
@@ -78,21 +86,21 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
       </div>
 
       {canEdit && (
-        <div className="card">
+        <div className="card" id="nova">
           <h2 className="h2">Nova oferta</h2>
           <NewOfferForm programId={program.id} sources={sources.map((x) => ({ slug: x.slug, name: x.name, level: x.level }))} />
         </div>
       )}
 
       {canEdit && (
-        <div className="card">
-          <h2 className="h2">Importar ofertas em lote</h2>
+        <details className="card fold">
+          <summary>Importar ofertas em lote</summary>
           <ImportOffersForm programId={program.id} />
-        </div>
+        </details>
       )}
 
-      <div className="card">
-        <h2 className="h2">Escala do Negócio</h2>
+      <details className="card fold" id="escala">
+        <summary>Escala do Negócio</summary>
         <p className="sub">Do topo (menor volume, maior ticket) à base (maior volume, menor ticket).</p>
         <table>
           <thead><tr><th>Nível</th><th>Volume</th><th>Ticket</th><th>Esforço</th><th>Papel</th><th>Receitas</th></tr></thead>
@@ -116,10 +124,10 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
             })}
           </tbody>
         </table>
-      </div>
+      </details>
 
-      <div className="card">
-        <h2 className="h2">Catálogo de receitas ({sources.length})</h2>
+      <details className="card fold">
+        <summary>Catálogo de receitas ({sources.length})</summary>
         <table>
           <thead><tr><th>#</th><th>Receita</th><th>Nível</th><th>Papel</th><th>Motor</th></tr></thead>
           <tbody>
@@ -128,24 +136,24 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
             ))}
           </tbody>
         </table>
-      </div>
+      </details>
 
       {canEdit && (
-        <div className="card">
-          <h2 className="h2">Padrões do template</h2>
-          <p className="sub">Completa este programa com portões, KPIs, ferramentas e pesos do score que o template tem e o programa ainda não (não altera nada que já exista).</p>
+        <details className="card fold">
+          <summary>Padrões do template</summary>
+          <p className="sub">Completa este programa com itens de checklist, KPIs, ferramentas e pesos do score que o template tem e o programa ainda não (não altera nada que já exista).</p>
           <LoadDefaultsButton programId={program.id} />
-        </div>
+        </details>
       )}
 
       {canEdit && (
-        <div className="card" id="editar">
-          <h2 className="h2">Editar programa (nome, propósito, datas)</h2>
+        <details className="card fold" id="editar">
+          <summary>Editar programa (nome, propósito, datas)</summary>
           <ProgramForm
             programId={program.id}
             initial={{ name: program.name, purpose: program.purpose, weeklyHours: program.weeklyHours, startDate: program.startDate, endDate: program.endDate, status: program.status }}
           />
-        </div>
+        </details>
       )}
     </>
   );

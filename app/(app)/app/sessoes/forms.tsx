@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmButton } from "@/components/ConfirmButton";
 import { useActionState, useState, useTransition } from "react";
 import { SaveState, SubmitButton } from "@/components/ui";
 import { createSessionAction, createTaskAction, setTaskStatusAction, type SessState } from "./actions";
@@ -10,8 +11,8 @@ function Feedback({ state }: { state: SessState }) {
   if (!state) return null;
   return (
     <>
-      {state.error && <div className="msg err">{state.error}</div>}
-      {state.ok && <div className="msg ok">{state.ok}</div>}
+      {state.error && <div role="alert" className="msg err">{state.error}</div>}
+      {state.ok && <div role="status" className="msg ok">{state.ok}</div>}
     </>
   );
 }
@@ -79,7 +80,7 @@ export function TaskStatusButtons({ taskId, status, canCancel }: { taskId: strin
       {status === "aberta" && <button className="btn sec" disabled={pending} onClick={() => run("concluida")}>✓ Concluir</button>}
       {status === "concluida" && <button className="btn sec" disabled={pending} onClick={() => run("aberta")}>Reabrir</button>}
       {status === "cancelada" && canCancel && <button className="btn sec" disabled={pending} onClick={() => run("aberta")}>Reabrir</button>}
-      {status === "aberta" && canCancel && <button className="btn sec" disabled={pending} onClick={() => confirm("Cancelar esta tarefa?") && run("cancelada")}>Cancelar</button>}
+      {status === "aberta" && canCancel && <ConfirmButton className="btn sec" disabled={pending} message="Cancelar esta tarefa?" confirmLabel="Cancelar tarefa" onConfirm={() => run("cancelada")}>Cancelar</ConfirmButton>}
       <SaveState pending={pending} error={res?.error} />
     </div>
   );

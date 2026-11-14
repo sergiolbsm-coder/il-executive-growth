@@ -14,7 +14,7 @@ export function PasswordForm() {
       <input id="next" name="next" type="password" autoComplete="new-password" minLength={8} required />
       <label htmlFor="confirm">Confirmar nova senha</label>
       <input id="confirm" name="confirm" type="password" autoComplete="new-password" minLength={8} required />
-      {state?.error && <div className="msg err">{state.error}</div>}
+      {state?.error && <div role="alert" className="msg err">{state.error}</div>}
       <SubmitButton>Salvar senha</SubmitButton>
     </form>
   );

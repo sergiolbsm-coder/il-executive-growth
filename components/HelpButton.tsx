@@ -60,10 +60,10 @@ export function HelpButton() {
               {Object.entries(TICKET_KINDS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
             <label htmlFor="help-title">Assunto (resumo em uma frase)</label>
-            <input id="help-title" name="title" maxLength={160} required placeholder="Ex.: não sei como marcar o portão" />
+            <input id="help-title" name="title" maxLength={160} required placeholder="Ex.: não sei como marcar um item do checklist" />
             <label htmlFor="help-desc">Detalhes — descreva ou cole aqui a mensagem que apareceu</label>
             <textarea id="help-desc" name="description" rows={5} maxLength={4000} />
-            {state?.error && <div className="msg err">{state.error}</div>}
+            {state?.error && <div role="alert" className="msg err">{state.error}</div>}
             <div className="row" style={{ marginTop: 12 }}>
               <SubmitButton pendingLabel="Enviando…">Enviar chamado</SubmitButton>
               <button type="button" className="btn sec" onClick={close}>Cancelar</button>

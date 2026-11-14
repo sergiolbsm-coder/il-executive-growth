@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMentee, listMentors } from "@/domains/mentees/service";
@@ -6,6 +7,9 @@ import { ForbiddenError, canCreateMentee } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { fmtDay } from "@/lib/format";
 import { AssignMentorsForm, EditMenteeForm, NewProgramForm } from "../forms";
+
+
+export const metadata: Metadata = { title: "Mentorado" };
 
 export default async function MenteePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

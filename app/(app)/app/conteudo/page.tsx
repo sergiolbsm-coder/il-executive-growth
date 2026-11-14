@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { listMentees, toRef } from "@/domains/mentees/service";
 import { listPrograms, loadProgram } from "@/domains/programs/service";
 import { listLinks } from "@/domains/content/service";
@@ -7,6 +8,9 @@ import { requireUser, toContext } from "@/lib/auth/session";
 import { fmtDay } from "@/lib/format";
 import { ProgramPicker, pickProgram } from "@/components/ProgramPicker";
 import { DoneCheck, LinkActions, NewLinkForm } from "./forms";
+
+
+export const metadata: Metadata = { title: "Conteúdo" };
 
 const HINT: Record<string, string> = {
   Drive: "Pastas e arquivos do Drive, planilhas e modelos do programa.",

@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmButton } from "@/components/ConfirmButton";
 import { useActionState, useState, useTransition } from "react";
 import { SaveState, SubmitButton } from "@/components/ui";
 import { LINK_CATEGORIES } from "@/domains/content/links";
@@ -9,8 +10,8 @@ function Feedback({ state }: { state: ContentState }) {
   if (!state) return null;
   return (
     <>
-      {state.error && <div className="msg err">{state.error}</div>}
-      {state.ok && <div className="msg ok">{state.ok}</div>}
+      {state.error && <div role="alert" className="msg err">{state.error}</div>}
+      {state.ok && <div role="status" className="msg ok">{state.ok}</div>}
     </>
   );
 }
@@ -73,16 +74,16 @@ export function LinkActions({ link }: { link: { id: string; title: string; url: 
   return (
     <div>
       <div className="row" style={{ gap: 6 }}>
-        <button className="btn sec" disabled={pending} onClick={() => confirm("Remover este link?") && start(async () => setRes(await removeLinkAction(link.id)))}>Remover</button>
+        <ConfirmButton className="btn sec" disabled={pending} message="Remover este link?" confirmLabel="Remover link" onConfirm={() => start(async () => setRes(await removeLinkAction(link.id)))}>Remover</ConfirmButton>
         <SaveState pending={pending} error={res?.error} />
       </div>
       <details style={{ marginTop: 6 }}>
         <summary style={{ cursor: "pointer", fontSize: 12 }}>Editar</summary>
         <form autoComplete="off" action={action}>
-          <label>Título</label><input name="title" defaultValue={link.title} required />
-          <label>Endereço</label><input name="url" type="url" defaultValue={link.url} required />
-          <label>Tipo</label><select name="category" defaultValue={link.category ?? ""}><option value="">Automático</option>{categoryOptions}</select>
-          <label>Descrição</label><input name="description" defaultValue={link.description ?? ""} />
+          <label>Título</label><input name="title" aria-label="Título" defaultValue={link.title} required />
+          <label>Endereço</label><input name="url" aria-label="Link" type="url" defaultValue={link.url} required />
+          <label>Tipo</label><select name="category" aria-label="Categoria" defaultValue={link.category ?? ""}><option value="">Automático</option>{categoryOptions}</select>
+          <label>Descrição</label><input name="description" aria-label="Descrição" defaultValue={link.description ?? ""} />
           <Feedback state={state} />
           <SubmitButton className="btn sec">Salvar link</SubmitButton>
         </form>

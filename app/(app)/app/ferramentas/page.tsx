@@ -1,11 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { listMentees } from "@/domains/mentees/service";
 import { listOffers } from "@/domains/offers/service";
-import { listPrograms } from "@/domains/programs/service";
+import { getProgram, listPrograms } from "@/domains/programs/service";
 import { listProgramTools } from "@/domains/tools/service";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { ProgramPicker, pickProgram } from "@/components/ProgramPicker";
 import { StartButton } from "./forms";
+
+
+export const metadata: Metadata = { title: "Começar" };
 
 const PHASES = [
   ["levantamento", "Levantamento"], ["prototipacao", "Prototipação"], ["lancamento", "Lançamento"], ["transversal", "Transversais"],
@@ -31,7 +35,8 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
   const programs = (await listPrograms(ctx, mentees)).filter((p) => p.status !== "encerrado").map((p) => ({ ...p, menteeName: mentees.find((m) => m.id === p.menteeId)?.fullName }));
   const prog = pickProgram(programs, sp.p);
   if (!prog) return (<><h1>Começar</h1><div className="card"><p className="empty">Nenhum programa ativo por aqui ainda.</p></div></>);
-  const [data, offers] = await Promise.all([listProgramTools(ctx, prog.id), listOffers(ctx, prog.id)]);
+  const [data, offers, pg] = await Promise.all([listProgramTools(ctx, prog.id), listOffers(ctx, prog.id), getProgram(ctx, prog.id)]);
+  const gateLabel = (k: string) => pg.gates.find((g) => g.key === k)?.label ?? k;
   const activeOffers = offers.filter((o) => o.status === "ativa").map((o) => ({ id: o.id, name: o.name }));
 
   // Situação de cada ferramenta: avulsa = tem entrada concluída; ligada a portão = concluída em TODAS as ofertas ativas.
@@ -49,7 +54,7 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <h1>Começar</h1>
-      <p className="sub">Passo a passo das ferramentas do programa. O check é automático: ao concluir a ferramenta, ela é marcada aqui e comprova os itens de portão ligados a ela. Usar as estratégicas eleva o Score de Alavancagem.</p>
+      <p className="sub">Passo a passo das ferramentas do programa. O check é automático: ao concluir a ferramenta, ela é marcada aqui e já conta nos itens do checklist da oferta. Usar as estratégicas eleva o Score de Alavancagem.</p>
       <ProgramPicker programs={programs} current={prog.id} base="/app/ferramentas" />
       {data.tools.length === 0 && <div className="card"><p className="empty">Este programa ainda não tem ferramentas. {data.canEdit ? "Abra o programa e use “Carregar padrões do template”." : ""}</p></div>}
       {trackable.length > 0 && (
@@ -73,7 +78,7 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
                       {t.name} {t.strategic && <span className="badge">estratégica</span>} {t.kind === "externa" && <span className="badge muted">externa</span>}
                     </div>
                     {t.description && <p className="desafio-descricao">{t.description}</p>}
-                    {t.gateKeys.length > 0 && <p className="desafio-descricao" style={{ margin: "4px 0 0", fontSize: 12 }}>Comprova no portão: {t.gateKeys.join(", ")}</p>}
+                    {t.gateKeys.length > 0 && <p className="desafio-descricao" style={{ margin: "4px 0 0", fontSize: 12 }}>Conta no checklist da oferta: {t.gateKeys.map(gateLabel).join(" · ")}</p>}
                     {gated && (
                       <>
                         <span className={`desafio-tag ${done ? "desafio-tag-ok" : "desafio-tag-prazo"}`}>{perOffer.length ? `${partial} de ${perOffer.length} ofertas` : "nenhuma oferta ativa ainda"}</span>

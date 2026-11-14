@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmButton } from "@/components/ConfirmButton";
 import { useState, useTransition } from "react";
 import { SaveState } from "@/components/ui";
 import { confirmGateAction, uncheckGateAction, type OfferState } from "../ofertas/actions";
@@ -12,7 +13,7 @@ export function ConfirmButtons({ offerId, gateKey }: { offerId: string; gateKey:
   return (
     <div className="row">
       <button className="btn sec" disabled={pending} onClick={() => run(() => confirmGateAction(offerId, gateKey))}>Confirmar</button>
-      <button className="btn sec" disabled={pending} onClick={() => confirm("Devolver este item ao mentorado (desmarcar)?") && run(() => uncheckGateAction(offerId, gateKey))}>Devolver</button>
+      <ConfirmButton className="btn sec" disabled={pending} message="Devolver este item ao mentorado (desmarcar)?" confirmLabel="Devolver item" onConfirm={() => run(() => uncheckGateAction(offerId, gateKey))}>Devolver</ConfirmButton>
       <SaveState pending={pending} error={res?.error} />
     </div>
   );

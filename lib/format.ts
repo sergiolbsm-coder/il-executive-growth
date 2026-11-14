@@ -39,3 +39,6 @@ export function parseBRLToCents(input: string): number | null {
   if (!Number.isFinite(n) || n < 0 || !/^\d+(\.\d{1,2})?$/.test(s)) return null;
   return Math.round(n * 100);
 }
+
+/** Número no padrão brasileiro (vírgula decimal): fmtNum(37.8) → "37,8". */
+export const fmtNum = (n: number, digits = 1) => n.toLocaleString("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: digits });

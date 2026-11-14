@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmButton } from "@/components/ConfirmButton";
 import { useActionState, useState, useTransition } from "react";
 import { SaveState, SubmitButton } from "@/components/ui";
 import Link from "next/link";
@@ -14,8 +15,8 @@ function Feedback({ state }: { state: OfferState }) {
   if (!state) return null;
   return (
     <>
-      {state.error && <div className="msg err">{state.error}</div>}
-      {state.ok && <div className="msg ok">{state.ok}</div>}
+      {state.error && <div role="alert" className="msg err">{state.error}</div>}
+      {state.ok && <div role="status" className="msg ok">{state.ok}</div>}
     </>
   );
 }
@@ -36,8 +37,8 @@ export function ImportOffersForm({ programId }: { programId: string }) {
         <SubmitButton className="btn sec" name="mode" value="check" pendingLabel="Conferindo…">Conferir</SubmitButton>
         <SubmitButton name="mode" value="apply" pendingLabel="Importando…">Importar</SubmitButton>
       </div>
-      {state?.error && <div className="msg err" style={{ whiteSpace: "pre-line" }}>{state.error}</div>}
-      {state?.ok && <div className="msg ok">{state.ok}</div>}
+      {state?.error && <div role="alert" className="msg err" style={{ whiteSpace: "pre-line" }}>{state.error}</div>}
+      {state?.ok && <div role="status" className="msg ok">{state.ok}</div>}
     </form>
   );
 }
@@ -66,7 +67,7 @@ export function AiCompleteForm({ offerId }: { offerId: string }) {
         <button type="button" className="btn sec" disabled={busy} onClick={gen}>{busy ? "Gerando…" : prompt ? "Gerar de novo" : "Gerar prompt"}</button>
         {prompt && <button type="button" className="btn sec" onClick={copy}>{copied ? "✅ Copiado" : "Copiar prompt"}</button>}
       </div>
-      {err && <div className="msg err">{err}</div>}
+      {err && <div role="alert" className="msg err">{err}</div>}
       {prompt && <textarea readOnly rows={10} value={prompt} aria-label="Prompt para a sua IA" onFocus={(e) => e.currentTarget.select()} />}
       <form autoComplete="off" action={action} style={{ marginTop: 10 }}>
         <label htmlFor="ai-answer">Resposta da sua IA (cole o bloco JSON)</label>
@@ -75,8 +76,8 @@ export function AiCompleteForm({ offerId }: { offerId: string }) {
           <SubmitButton className="btn sec" name="mode" value="check" pendingLabel="Conferindo…">Conferir</SubmitButton>
           <SubmitButton name="mode" value="apply" pendingLabel="Importando…">Importar</SubmitButton>
         </div>
-        {state?.error && <div className="msg err" style={{ whiteSpace: "pre-line" }}>{state.error}</div>}
-        {state?.ok && <div className="msg ok" style={{ whiteSpace: "pre-line" }}>{state.ok}</div>}
+        {state?.error && <div role="alert" className="msg err" style={{ whiteSpace: "pre-line" }}>{state.error}</div>}
+        {state?.ok && <div role="status" className="msg ok" style={{ whiteSpace: "pre-line" }}>{state.ok}</div>}
       </form>
     </div>
   );
@@ -258,7 +259,7 @@ export function GateItem({ offerId, gate, check, salesCount, canStaff, canPropos
         {check && canStaff && (
           <div className="row" style={{ marginTop: 6 }}>
             {check.state === "pendente" && <button className="btn sec" disabled={pending} onClick={() => run(() => confirmGateAction(offerId, gate.key))}>Confirmar</button>}
-            <button className="btn sec" disabled={pending} onClick={() => confirm("Desmarcar este item? O estágio da oferta pode voltar.") && run(() => uncheckGateAction(offerId, gate.key))}>Desmarcar</button>
+            <ConfirmButton className="btn sec" disabled={pending} message="Desmarcar este item? O estágio da oferta pode voltar." confirmLabel="Desmarcar item" onConfirm={() => run(() => uncheckGateAction(offerId, gate.key))}>Desmarcar</ConfirmButton>
             <SaveState pending={pending} error={res?.error} />
           </div>
         )}
@@ -268,7 +269,7 @@ export function GateItem({ offerId, gate, check, salesCount, canStaff, canPropos
             <SubmitButton className="btn sec" pendingLabel="Salvando…">{canStaff ? "Marcar" : "Enviar p/ confirmação"}</SubmitButton>
           </form>
         )}
-        {state?.error && <div className="msg err">{state.error}</div>}
+        {state?.error && <div role="alert" className="msg err">{state.error}</div>}
       </div>
     </div>
   );
@@ -304,8 +305,8 @@ export function SaleForm({ offerId, siblings, today }: { offerId: string; siblin
 export function RemoveSaleButton({ offerId, saleId }: { offerId: string; saleId: string }) {
   const [pending, start] = useTransition();
   return (
-    <button className="btn sec" disabled={pending} onClick={() => confirm("Remover esta venda? O registro fica na auditoria.") && start(async () => void (await removeSaleAction(offerId, saleId)))}>
+    <ConfirmButton className="btn sec" disabled={pending} message="Remover esta venda? O registro fica na auditoria." confirmLabel="Remover venda" onConfirm={() => start(async () => void (await removeSaleAction(offerId, saleId)))}>
       Remover
-    </button>
+    </ConfirmButton>
   );
 }

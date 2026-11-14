@@ -12,7 +12,7 @@ export function LoginForm() {
       <input id="email" name="email" type="email" autoComplete="username" required />
       <label htmlFor="password">Senha</label>
       <input id="password" name="password" type="password" autoComplete="current-password" required />
-      {state?.error && <div className="msg err">{state.error}</div>}
+      {state?.error && <div role="alert" className="msg err">{state.error}</div>}
       <SubmitButton pendingLabel="Entrando…">Entrar</SubmitButton>
     </form>
   );

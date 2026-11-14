@@ -36,8 +36,8 @@ export function ProgramForm({
         <div style={{ flex: 1 }}><label htmlFor="startDate">Início</label><input id="startDate" name="startDate" type="date" defaultValue={initial.startDate ?? ""} /></div>
         <div style={{ flex: 1 }}><label htmlFor="endDate">Término</label><input id="endDate" name="endDate" type="date" defaultValue={initial.endDate ?? ""} /></div>
       </div>
-      {state?.error && <div className="msg err">{state.error}</div>}
-      {state?.ok && <div className="msg ok">{state.ok}</div>}
+      {state?.error && <div role="alert" className="msg err">{state.error}</div>}
+      {state?.ok && <div role="status" className="msg ok">{state.ok}</div>}
       <SubmitButton>Salvar</SubmitButton>
     </form>
   );
@@ -49,8 +49,8 @@ export function LoadDefaultsButton({ programId }: { programId: string }) {
   return (
     <div>
       <button className="btn sec" disabled={pending} onClick={() => start(async () => setRes(await loadDefaultsAction(programId)))}>{pending ? "Carregando…" : "Carregar padrões do template"}</button>
-      {res?.error && <div className="msg err">{res.error}</div>}
-      {res?.ok && <div className="msg ok">{res.ok}</div>}
+      {res?.error && <div role="alert" className="msg err">{res.error}</div>}
+      {res?.ok && <div role="status" className="msg ok">{res.ok}</div>}
     </div>
   );
 }

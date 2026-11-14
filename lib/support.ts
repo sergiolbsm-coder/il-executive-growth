@@ -21,7 +21,7 @@ export const TICKET_AREAS = {
   conteudo: { label: "Conteúdo (links, atividades e assessments)", path: "/app/conteudo" },
   sessoes: { label: "Sessões e tarefas", path: "/app/sessoes" },
   ferramentas: { label: "Ferramentas", path: "/app/ferramentas" },
-  portoes: { label: "Portões (critérios de estágio)", path: "/app/portoes" },
+  portoes: { label: "Itens a confirmar (critérios de estágio)", path: "/app/portoes" },
   acesso: { label: "Acesso / senha / e-mail", path: "/login" },
   outro: { label: "Outro assunto", path: "" },
 } as const;

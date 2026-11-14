@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "IL Executive Growth — Instituto da Liderança",
+  title: { default: "IL Executive Growth — Instituto da Liderança", template: "%s · IL Executive Growth" },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "48x48" },
@@ -24,7 +24,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
+        {children}
+      </body>
     </html>
   );
 }

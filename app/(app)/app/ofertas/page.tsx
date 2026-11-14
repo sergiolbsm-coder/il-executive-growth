@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { listMentees } from "@/domains/mentees/service";
 import { listOffers } from "@/domains/offers/service";
@@ -7,6 +8,9 @@ import { fmtDay } from "@/lib/format";
 import { stageName } from "@/lib/stages";
 import { Meters } from "@/components/ProgramMap";
 import { ScheduleBadge, StageBar } from "@/components/StageBar";
+
+
+export const metadata: Metadata = { title: "Ofertas" };
 
 export default async function OffersOverviewPage() {
   const user = await requireUser();

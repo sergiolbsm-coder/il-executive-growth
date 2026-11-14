@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmButton } from "@/components/ConfirmButton";
 import { useRouter } from "next/navigation";
 import { useActionState, useState, useTransition } from "react";
 import { SaveState, SubmitButton } from "@/components/ui";
@@ -12,8 +13,8 @@ function Feedback({ state }: { state: StrategyState }) {
   if (!state) return null;
   return (
     <>
-      {state.error && <div className="msg err">{state.error}</div>}
-      {state.ok && <div className="msg ok">{state.ok}</div>}
+      {state.error && <div role="alert" className="msg err">{state.error}</div>}
+      {state.ok && <div role="status" className="msg ok">{state.ok}</div>}
     </>
   );
 }
@@ -26,23 +27,23 @@ function CardFieldsForm({ initial }: { initial?: CardFields }) {
       <div className="row">
         <div style={{ flex: 1, minWidth: 150 }}>
           <label>Tipo do cartão</label>
-          <select name="kind" defaultValue={initial?.kind ?? "cliente"}>{Object.entries(CARD_KINDS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
+          <select name="kind" aria-label="Tipo do cartão" defaultValue={initial?.kind ?? "cliente"}>{Object.entries(CARD_KINDS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
         </div>
         <div style={{ flex: 1, minWidth: 120 }}>
           <label>Prioridade</label>
-          <select name="priority" defaultValue={initial?.priority ?? "media"}>{Object.entries(PRIORITIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
+          <select name="priority" aria-label="Prioridade" defaultValue={initial?.priority ?? "media"}>{Object.entries(PRIORITIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
         </div>
       </div>
       <label>Título (perfil ou demanda — nunca o nome de uma pessoa ou empresa)</label>
-      <input name="title" maxLength={160} required defaultValue={initial?.title ?? ""} placeholder="Ex.: Escolas privadas de médio porte" />
+      <input name="title" maxLength={160} required defaultValue={initial?.title ?? ""} placeholder="Ex.: Escolas privadas de médio porte" aria-label="Ex.: Escolas privadas de médio porte" />
       <label>Quem é / o que pede</label>
-      <textarea name="description" rows={2} maxLength={1000} defaultValue={initial?.description ?? ""} />
+      <textarea name="description" aria-label="Descrição" rows={2} maxLength={1000} defaultValue={initial?.description ?? ""} />
       <label>O que fazer ou dizer nesta etapa</label>
-      <textarea name="approach" rows={3} maxLength={1000} defaultValue={initial?.approach ?? ""} placeholder="Roteiro, argumento ou pergunta-chave" />
+      <textarea name="approach" rows={3} maxLength={1000} defaultValue={initial?.approach ?? ""} placeholder="Roteiro, argumento ou pergunta-chave" aria-label="Roteiro, argumento ou pergunta-chave" />
       <label>Objeção provável e a resposta</label>
-      <textarea name="objection" rows={2} maxLength={1000} defaultValue={initial?.objection ?? ""} />
+      <textarea name="objection" aria-label="Objeção e como responder" rows={2} maxLength={1000} defaultValue={initial?.objection ?? ""} />
       <label>Material de apoio (link, opcional)</label>
-      <input name="materialUrl" type="url" placeholder="https://…" defaultValue={initial?.materialUrl ?? ""} />
+      <input name="materialUrl" type="url" placeholder="https://…" aria-label="https://…" defaultValue={initial?.materialUrl ?? ""} />
     </>
   );
 }
@@ -87,8 +88,7 @@ export function CardActions({ card }: { card: CardFields & { id: string; stage: 
           <Feedback state={state} />
           <div className="row">
             <SubmitButton className="btn sec">Salvar</SubmitButton>
-            <button type="button" className="btn sec" disabled={pending} style={{ marginTop: 16 }}
-              onClick={() => confirm("Remover este cartão e as lições dele?") && start(async () => setRes(await removeCardAction(card.id)))}>Remover cartão</button>
+            <ConfirmButton className="btn sec" disabled={pending} style={{ marginTop: 16 }} message="Remover este cartão e as lições dele?" confirmLabel="Remover cartão" onConfirm={() => start(async () => setRes(await removeCardAction(card.id)))}>Remover cartão</ConfirmButton>
           </div>
         </form>
       </details>
@@ -120,8 +120,8 @@ export function Lessons({ cardId, stage, lessons }: { cardId: string; stage: str
           {editing === l.id ? (
             <form autoComplete="off" action={editAction}>
               <input type="hidden" name="id" value={l.id} />
-              <input name="question" defaultValue={l.question} maxLength={300} required />
-              <textarea name="answer" rows={3} defaultValue={l.answer} maxLength={2000} required />
+              <input name="question" aria-label="Pergunta" defaultValue={l.question} maxLength={300} required />
+              <textarea name="answer" aria-label="Resposta" rows={3} defaultValue={l.answer} maxLength={2000} required />
               <Feedback state={editState} />
               <div className="row"><SubmitButton className="btn sec">Salvar</SubmitButton><button type="button" className="btn sec" style={{ marginTop: 16 }} onClick={() => setEditing(null)}>Cancelar</button></div>
             </form>
@@ -131,26 +131,26 @@ export function Lessons({ cardId, stage, lessons }: { cardId: string; stage: str
               <p>{l.answer}</p>
               <div className="row" style={{ gap: 6 }}>
                 <button className="btn sec" style={{ padding: "2px 8px", fontSize: 11 }} onClick={() => setEditing(l.id)}>Editar</button>
-                <button className="btn sec" style={{ padding: "2px 8px", fontSize: 11 }} disabled={pending} onClick={() => confirm("Remover esta lição?") && start(async () => setRes(await removeLessonAction(l.id)))}>Remover</button>
+                <ConfirmButton className="btn sec" style={{ padding: "2px 8px", fontSize: 11 }} disabled={pending} message="Remover esta lição?" confirmLabel="Remover lição" onConfirm={() => start(async () => setRes(await removeLessonAction(l.id)))}>Remover</ConfirmButton>
               </div>
             </>
           )}
         </div>
       ))}
-      {res?.error && <div className="msg err">{res.error}</div>}
+      {res?.error && <div role="alert" className="msg err">{res.error}</div>}
       {canHaveLessons(stage) && (
         <details>
           <summary style={{ cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Registrar lição</summary>
           <form autoComplete="off" action={action} key={state?.ok ?? "new"}>
             <label>Pergunta</label>
-            <select name="questionPick" value={pick} onChange={(e) => setPick(e.target.value)} required>
+            <select name="questionPick" aria-label="Pergunta sugerida" value={pick} onChange={(e) => setPick(e.target.value)} required>
               <option value="" disabled>Escolha uma pergunta…</option>
               {suggestions.map((q) => <option key={q} value={q}>{q}</option>)}
               <option value="__outra">Outra pergunta (escrever)…</option>
             </select>
-            {pick === "__outra" && <input name="questionCustom" maxLength={300} placeholder="Escreva a pergunta" required />}
+            {pick === "__outra" && <input name="questionCustom" maxLength={300} placeholder="Escreva a pergunta" aria-label="Escreva a pergunta" required />}
             <label>Resposta</label>
-            <textarea name="answer" rows={3} maxLength={2000} required />
+            <textarea name="answer" aria-label="Resposta" rows={3} maxLength={2000} required />
             <Feedback state={state} />
             <SubmitButton className="btn sec" pendingLabel="Registrando…">Registrar lição</SubmitButton>
           </form>

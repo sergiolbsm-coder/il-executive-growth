@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOffer } from "@/domains/offers/service";
@@ -10,6 +11,9 @@ import { STAGES, stageName } from "@/lib/stages";
 import { ScheduleBadge, StageBar } from "@/components/StageBar";
 import { guideFor, STAGE_GUIDES } from "@/lib/stage-guides";
 import { AiCompleteForm, GateItem, OfferEditForm, RemoveSaleButton, SaleForm, StatusForm } from "../forms";
+
+
+export const metadata: Metadata = { title: "Oferta" };
 
 export default async function OfferPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -41,7 +45,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
         Receita: {sources.find((x) => x.slug === offer.revenueSlug)?.name ?? offer.revenueSlug} · Meta: {stageName(offer.targetStage)}{offer.dueDate ? ` até ${fmtDay(offer.dueDate)}` : ""} · nível {offer.level}{offer.wave ? ` · onda ${offer.wave}` : ""}
         {offer.priceNote ? ` · ${offer.priceNote}` : ""}
       </p>
-      {!active && offer.statusReason && <div className="msg err">Oferta {offer.status}: {offer.statusReason}</div>}
+      {!active && offer.statusReason && <div role="alert" className="msg err">Oferta {offer.status}: {offer.statusReason}</div>}
 
       <div className="card">
         <StageBar stage={offer.stage} />
@@ -89,7 +93,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
               </details>
             )}
             {list.length === 0 ? (
-              <p className="empty">Nenhum portão configurado para este estágio.</p>
+              <p className="empty">Nenhum item de checklist configurado para este estágio.</p>
             ) : (
               list.map((g) => {
                 const c = byKey.get(g.key);

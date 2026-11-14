@@ -7,7 +7,7 @@ export function StageBar({ stage, compact = false }: { stage: number; compact?: 
     <div className={`stagebar${compact ? " compact" : ""}`} role="img" aria-label={`Estágio ${stage} de 7: ${stageName(stage)}`}>
       {STAGES.map((s) => (
         <span key={s.n} className={`step${s.n < stage ? " done" : ""}${s.n === stage ? " current" : ""}`} title={`${s.n}. ${s.name} (${s.phase})`}>
-          {!compact && <i>{s.name}</i>}
+          {!compact && <i><b className="n">{s.n}</b><span className="nm">{s.name}</span></i>}
         </span>
       ))}
     </div>

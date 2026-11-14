@@ -35,7 +35,7 @@ export async function saveEntryAction(entryId: string, _: ToolState, f: FormData
     revalidatePath("/app/ofertas");
     revalidatePath("/app/portoes");
     if (!conclude) return { ok: "Rascunho salvo." };
-    const gate = r.marked.length ? ` ${r.marked.length} item(ns) de portão comprovado(s) na oferta.` : "";
+    const gate = r.marked.length ? ` ${r.marked.length} item(ns) do checklist comprovado(s) na oferta.` : "";
     return { ok: `Ferramenta concluída.${gate}`, warnings: r.warnings };
   } catch (e) {
     if (e instanceof ValidationError || e instanceof ForbiddenError) return { error: e.message };
@@ -51,7 +51,7 @@ export async function reviewEntryAction(entryId: string): Promise<ToolState> {
     revalidatePath("/app/ferramentas");
     revalidatePath("/app/ofertas");
     revalidatePath("/app/portoes");
-    return { ok: r.confirmed.length ? `Revisada. ${r.confirmed.length} item(ns) de portão confirmado(s).` : "Revisada." };
+    return { ok: r.confirmed.length ? `Revisada. ${r.confirmed.length} item(ns) do checklist confirmado(s).` : "Revisada." };
   } catch (e) {
     if (e instanceof ValidationError || e instanceof ForbiddenError) return { error: e.message };
     throw e;

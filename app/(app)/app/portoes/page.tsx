@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { listPendingGates } from "@/domains/offers/service";
@@ -6,6 +7,9 @@ import { requireUser, toContext } from "@/lib/auth/session";
 import { fmtDateTime } from "@/lib/format";
 import { ConfirmButtons } from "./confirm";
 
+
+export const metadata: Metadata = { title: "Itens a confirmar" };
+
 export default async function PendingGatesPage() {
   const user = await requireUser();
   const ctx = toContext(user);
@@ -13,7 +17,7 @@ export default async function PendingGatesPage() {
   const rows = await listPendingGates(ctx);
   return (
     <>
-      <h1>Portões a confirmar</h1>
+      <h1>Itens a confirmar</h1>
       <p className="sub">Itens que o mentorado marcou com evidência. Só contam para o estágio da oferta depois da sua confirmação.</p>
       <div className="card">
         {rows.length === 0 ? (

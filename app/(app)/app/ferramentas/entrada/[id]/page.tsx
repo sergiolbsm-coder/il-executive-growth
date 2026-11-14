@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEntry } from "@/domains/tools/service";
@@ -6,6 +7,9 @@ import { requireUser, toContext } from "@/lib/auth/session";
 import { ValidationError } from "@/lib/errors";
 import { fmtDateTime } from "@/lib/format";
 import { EntryForm, ReviewButton } from "../../forms";
+
+
+export const metadata: Metadata = { title: "Ferramenta" };
 
 export default async function EntryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -29,13 +33,13 @@ export default async function EntryPage({ params }: { params: Promise<{ id: stri
       </p>
       {tool.description && <p className="sub">{tool.description}</p>}
       {linkedGates.length > 0 && offer && (
-        <div className="msg ok">Ao concluir, esta ferramenta comprova na oferta: {linkedGates.map((g) => g.label).join(" · ")}. {user.role === "mentorado" ? "Os itens ficam pendentes até a equipe confirmar." : ""}</div>
+        <div role="status" className="msg ok">Ao concluir, esta ferramenta comprova na oferta: {linkedGates.map((g) => g.label).join(" · ")}. {user.role === "mentorado" ? "Os itens ficam pendentes até a equipe confirmar." : ""}</div>
       )}
       <div className="card"><EntryForm entryId={entry.id} fields={tool.fields} data={entry.data} /></div>
       {canReview && entry.status === "concluida" && !entry.reviewedAt && (
         <div className="card">
           <h2 className="h2">Revisão da equipe</h2>
-          <p className="sub">Revisar confirma os itens de portão pendentes ligados a esta ferramenta e faz ela contar integralmente no Score.</p>
+          <p className="sub">Revisar confirma os itens do checklist que estavam pendentes e ligados a esta ferramenta e faz ela contar integralmente no Score.</p>
           <ReviewButton entryId={entry.id} />
         </div>
       )}

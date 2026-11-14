@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTicket } from "@/domains/support/service";
@@ -6,6 +7,9 @@ import { requireUser, toContext } from "@/lib/auth/session";
 import { fmtDateTimeFull } from "@/lib/format";
 import { TICKET_AREAS, TICKET_KINDS, TICKET_STATUS, type TicketArea } from "@/lib/support";
 import { ReplyForm, ResolveForm, TicketButtons } from "../forms";
+
+
+export const metadata: Metadata = { title: "Chamado" };
 
 export default async function TicketPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

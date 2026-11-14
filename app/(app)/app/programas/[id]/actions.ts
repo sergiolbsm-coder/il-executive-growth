@@ -34,7 +34,7 @@ export async function loadDefaultsAction(programId: string): Promise<ProgramStat
   try {
     const a = await loadTemplateDefaults(actor, programId);
     revalidatePath(`/app/programas/${programId}`);
-    const parts = [a.gates && `${a.gates} portão(ões)`, a.kpis && `${a.kpis} KPI(s)`, a.tools && `${a.tools} ferramenta(s)`, a.weights && "pesos do score"].filter(Boolean);
+    const parts = [a.gates && `${a.gates} item(ns) de checklist`, a.kpis && `${a.kpis} KPI(s)`, a.tools && `${a.tools} ferramenta(s)`, a.weights && "pesos do score"].filter(Boolean);
     return { ok: parts.length ? `Carregado do template: ${parts.join(", ")}.` : "O programa já tem tudo o que o template oferece." };
   } catch (e) {
     if (e instanceof ValidationError || e instanceof ForbiddenError) return { error: e.message };

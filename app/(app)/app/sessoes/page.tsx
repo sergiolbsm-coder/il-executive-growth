@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { listMentees } from "@/domains/mentees/service";
 import { listPrograms } from "@/domains/programs/service";
 import { listSessions, listTasks } from "@/domains/sessions/service";
@@ -6,6 +7,9 @@ import { isStaff } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { fmtDay } from "@/lib/format";
 import { NewSessionForm, NewTaskForm, TaskStatusButtons } from "./forms";
+
+
+export const metadata: Metadata = { title: "Sessões e tarefas" };
 
 export default async function SessionsPage() {
   const user = await requireUser();

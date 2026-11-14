@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { listMentees } from "@/domains/mentees/service";
 import { listOffers, salesByLevel } from "@/domains/offers/service";
 import { getProgram, listPrograms } from "@/domains/programs/service";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { fmtBRL } from "@/lib/format";
+
+
+export const metadata: Metadata = { title: "Escala do Negócio" };
 
 // Cores do topo (nível 5) à base (nível 1) e larguras que desenham a pirâmide.
 const COLOR: Record<number, string> = { 5: "#261062", 4: "#391694", 3: "#4D1DBF", 2: "#7A4FE0", 1: "#00A9A3" };
@@ -51,7 +55,7 @@ export default async function ScalePage() {
                 );
               })}
             </div>
-            {thin && <div className="msg err">Base fina: {base} oferta(s) de volume (níveis 1–2) para {top} de ticket alto (níveis 3–5). Falta alcance para sustentar o topo.</div>}
+            {thin && <div role="alert" className="msg err">Base fina: {base} oferta(s) de volume (níveis 1–2) para {top} de ticket alto (níveis 3–5). Falta alcance para sustentar o topo.</div>}
             <p className="sub" style={{ margin: "12px 0" }}>Receita realizada no programa: <b>{fmtBRL(total)}</b></p>
             <table>
               <thead><tr><th>Nível</th><th>Volume</th><th>Ticket</th><th>Esforço</th><th>Papel</th><th>Ofertas</th><th>Vendas</th></tr></thead>

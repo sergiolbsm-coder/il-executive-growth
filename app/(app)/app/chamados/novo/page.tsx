@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { listMentees } from "@/domains/mentees/service";
 import { isStaff } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { areaFromPath } from "@/lib/support";
 import { NewTicketForm } from "../forms";
+
+
+export const metadata: Metadata = { title: "Novo chamado" };
 
 export default async function NewTicketPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
   const { from } = await searchParams;

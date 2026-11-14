@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { listMentees } from "@/domains/mentees/service";
 import { listOffers } from "@/domains/offers/service";
@@ -7,6 +8,9 @@ import { requireUser, toContext } from "@/lib/auth/session";
 import { CARD_KINDS, FUNNEL_STAGES, PRIORITIES, type CardKind } from "@/lib/strategy";
 import { ProgramPicker, pickProgram } from "@/components/ProgramPicker";
 import { CardActions, Lessons, NewCardForm, OfferSelect } from "./forms";
+
+
+export const metadata: Metadata = { title: "Estratégia de vendas" };
 
 export default async function StrategyPage({ searchParams }: { searchParams: Promise<{ p?: string; o?: string; k?: string }> }) {
   const sp = await searchParams;

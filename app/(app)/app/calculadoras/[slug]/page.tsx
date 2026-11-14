@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
+
+
+export const metadata: Metadata = { title: "Calculadoras" };
 
 const CALCS: Record<string, { title: string; sub: string }> = {
   precificacao: { title: "Calculadora de precificação", sub: "Calcule o preço de uma oferta a partir de custos, margem e impostos." },

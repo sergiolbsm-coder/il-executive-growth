@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
 import { requireUser } from "@/lib/auth/session";
 import { PasswordForm } from "./form";
+
+
+export const metadata: Metadata = { title: "Trocar senha" };
 
 export default async function ChangePasswordPage() {
   const user = await requireUser({ allowPasswordChange: true });

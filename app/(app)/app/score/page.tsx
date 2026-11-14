@@ -1,11 +1,16 @@
+import type { Metadata } from "next";
 import { listMentees } from "@/domains/mentees/service";
 import { listPrograms } from "@/domains/programs/service";
 import { SCORE_HELP, SCORE_KEYS } from "@/domains/score/compute";
 import { getScore, listSnapshots } from "@/domains/score/service";
 import { requireUser, toContext } from "@/lib/auth/session";
+import { fmtNum } from "@/lib/format";
 import { weekLabel } from "@/lib/week";
 import { ProgramPicker, pickProgram } from "@/components/ProgramPicker";
 import { SnapshotButton, WeightsForm } from "./forms";
+
+
+export const metadata: Metadata = { title: "Score de Alavancagem" };
 
 export default async function ScorePage({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
   const sp = await searchParams;
@@ -25,7 +30,7 @@ export default async function ScorePage({ searchParams }: { searchParams: Promis
 
       <div className="card">
         <div className="row" style={{ alignItems: "center", gap: 24 }}>
-          <div className="score-big">{score.total.toFixed(1)}<small> / 100</small></div>
+          <div className="score-big">{fmtNum(score.total)}<small> / 100</small></div>
           <div style={{ flex: 1, minWidth: 240 }}>
             <div className="bar" style={{ height: 14 }}><i style={{ width: `${score.total}%` }} /></div>
             <p className="sub" style={{ margin: "8px 0 0" }}>{prog.menteeName} · {prog.name}</p>
@@ -38,26 +43,34 @@ export default async function ScorePage({ searchParams }: { searchParams: Promis
           <h2 className="h2">Próximo melhor passo</h2>
           <p className="sub">Onde há mais pontos a ganhar agora.</p>
           {score.steps.map((s) => (
-            <p key={s.key} style={{ margin: "8px 0" }}><b>{s.label}:</b> {s.text} <span className="badge">até +{s.upTo.toFixed(1)} pts</span></p>
+            <p key={s.key} style={{ margin: "8px 0" }}><b>{s.label}:</b> {s.text} <span className="badge">até +{fmtNum(s.upTo)} pts</span></p>
           ))}
         </div>
       )}
 
       <div className="card">
         <h2 className="h2">Composição</h2>
-        <table>
-          <thead><tr><th>Componente</th><th style={{ width: 220 }}>Preenchimento</th><th>Pontos</th><th>O que falta</th></tr></thead>
-          <tbody>
-            {score.components.map((c) => (
-              <tr key={c.key}>
-                <td><b>{c.label}</b><br /><span className="opt" style={{ fontSize: 11 }}>{SCORE_HELP[c.key]}</span></td>
-                <td><div className="bar"><i style={{ width: `${Math.round(c.ratio * 100)}%` }} /></div><span className="opt">{Math.round(c.ratio * 100)}%</span></td>
-                <td>{c.points.toFixed(1)} / {c.weight}</td>
-                <td>{c.hints.length === 0 ? <span className="tl tl-verde">completo</span> : <ul style={{ margin: 0, paddingLeft: 18 }}>{c.hints.slice(0, 3).map((h) => <li key={h} style={{ fontSize: 13 }}>{h}</li>)}</ul>}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <p className="sub">O score soma {score.components.length} componentes. Cada um vale um número máximo de pontos (o “peso”); quanto mais completo, mais pontos.</p>
+        <div className="score-comps">
+          {score.components.map((c) => (
+            <section key={c.key} className="score-comp" aria-label={c.label}>
+              <div className="score-comp-head">
+                <h3>{c.label}</h3>
+                <span className="score-comp-pts">{fmtNum(c.points)} <small>/ {c.weight} pts</small></span>
+              </div>
+              <p className="score-comp-help">{SCORE_HELP[c.key]}</p>
+              <div className="bar" role="img" aria-label={`${Math.round(c.ratio * 100)}% preenchido`}><i style={{ width: `${Math.round(c.ratio * 100)}%` }} /></div>
+              <div className="score-comp-miss">
+                {c.hints.length === 0 ? <span className="tl tl-verde">completo</span> : (
+                  <>
+                    <b>O que falta:</b>
+                    <ul>{c.hints.slice(0, 3).map((h) => <li key={h}>{h}</li>)}</ul>
+                  </>
+                )}
+              </div>
+            </section>
+          ))}
+        </div>
       </div>
 
       <div className="card">
@@ -65,7 +78,7 @@ export default async function ScorePage({ searchParams }: { searchParams: Promis
         {snaps.length === 0 ? <p className="empty">Ainda sem histórico. O retrato da semana é gravado ao salvar o check-in, ou pelo botão abaixo.</p> : (
           <table>
             <thead><tr><th>Semana</th><th>Score</th><th style={{ width: 240 }}></th></tr></thead>
-            <tbody>{snaps.map((s) => <tr key={s.id}><td>{weekLabel(s.weekStart)}</td><td>{s.total.toFixed(1)}</td><td><div className="bar"><i style={{ width: `${s.total}%` }} /></div></td></tr>)}</tbody>
+            <tbody>{snaps.map((s) => <tr key={s.id}><td>{weekLabel(s.weekStart)}</td><td>{fmtNum(s.total)}</td><td><div className="bar"><i style={{ width: `${s.total}%` }} /></div></td></tr>)}</tbody>
           </table>
         )}
         <div style={{ marginTop: 12 }}><SnapshotButton programId={prog.id} /></div>

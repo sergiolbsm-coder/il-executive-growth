@@ -1,8 +1,12 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTemplate, listTemplates } from "@/domains/templates/service";
 import { canManageTemplates } from "@/lib/authorization";
 import { EditTemplateForm } from "./form";
 import { requireUser, toContext } from "@/lib/auth/session";
+
+
+export const metadata: Metadata = { title: "Templates" };
 
 export default async function TemplatesPage() {
   const user = await requireUser();

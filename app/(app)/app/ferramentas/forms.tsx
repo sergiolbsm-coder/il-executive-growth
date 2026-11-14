@@ -9,9 +9,9 @@ function Feedback({ state }: { state: ToolState }) {
   if (!state) return null;
   return (
     <>
-      {state.error && <div className="msg err">{state.error}</div>}
-      {state.ok && <div className="msg ok">{state.ok}</div>}
-      {state.warnings?.map((w) => <div key={w} className="msg err">⚠ {w}</div>)}
+      {state.error && <div role="alert" className="msg err">{state.error}</div>}
+      {state.ok && <div role="status" className="msg ok">{state.ok}</div>}
+      {state.warnings?.map((w) => <div key={w} role="alert" className="msg err">⚠ {w}</div>)}
     </>
   );
 }
@@ -96,7 +96,7 @@ export function StartButton({ programId, slug, offerId, label = "Começar" }: { 
     <form autoComplete="off" action={action}>
       {offerId && <input type="hidden" name="offerId" value={offerId} />}
       <SubmitButton className="btn sec" pendingLabel="Abrindo…">{label}</SubmitButton>
-      {state?.error && <div className="msg err">{state.error}</div>}
+      {state?.error && <div role="alert" className="msg err">{state.error}</div>}
     </form>
   );
 }

@@ -10,7 +10,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="app-shell">
       <NavProgress />
       <Sidebar items={navFor(user.role)} user={{ name: user.name, role: user.role }} />
-      <main className="main">{children}</main>
+      <main className="main" id="conteudo" tabIndex={-1}>{children}</main>
       {user.role === "mentorado" && <HelpButton />}
     </div>
   );

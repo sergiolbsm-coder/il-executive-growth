@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { listMentees, listMentors } from "@/domains/mentees/service";
@@ -5,6 +6,9 @@ import { listPrograms } from "@/domains/programs/service";
 import { canCreateMentee } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { NewMenteeForm } from "./forms";
+
+
+export const metadata: Metadata = { title: "Mentorados" };
 
 export default async function MenteesPage() {
   const user = await requireUser();

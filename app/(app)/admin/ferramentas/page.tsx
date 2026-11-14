@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { listToolsAdmin } from "@/domains/tools/service";
 import { canManageTemplates } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { TemplateToolsForm, ToolEditor, type ToolFormValue } from "./forms";
+
+
+export const metadata: Metadata = { title: "Cadastro de ferramentas" };
 
 const NEW_FIELDS = JSON.stringify([{ key: "campo1", label: "Primeiro campo", type: "textarea", required: true }], null, 2);
 const PHASE: Record<string, string> = { levantamento: "Levantamento", prototipacao: "Prototipação", lancamento: "Lançamento", transversal: "Transversal" };
@@ -23,7 +27,7 @@ export default async function AdminToolsPage({ searchParams }: { searchParams: P
     <>
       <h1>Ferramentas (cadastro)</h1>
       <p className="sub">Catálogo de ferramentas da Caixa de ferramentas. Ferramentas declarativas são formulários definidos por campos; as externas abrem um link.</p>
-      {sp.saved && <div className="msg ok">Ferramenta salva.</div>}
+      {sp.saved && <div role="status" className="msg ok">Ferramenta salva.</div>}
       <div className="card">
         <div className="row" style={{ justifyContent: "space-between", marginBottom: 8 }}><h2 className="h2" style={{ margin: 0 }}>Catálogo ({tools.length})</h2><Link href="/admin/ferramentas?t=novo" className="btn sec">+ Nova ferramenta</Link></div>
         <table>

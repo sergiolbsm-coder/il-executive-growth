@@ -16,8 +16,8 @@ export function EditTemplateForm({ id, initial }: { id: string; initial: { name:
       </div>
       <label htmlFor={`notes-${id}`}>Observações</label>
       <input id={`notes-${id}`} name="notes" defaultValue={initial.notes ?? ""} />
-      {state?.error && <div className="msg err">{state.error}</div>}
-      {state?.ok && <div className="msg ok">{state.ok}</div>}
+      {state?.error && <div role="alert" className="msg err">{state.error}</div>}
+      {state?.ok && <div role="status" className="msg ok">{state.ok}</div>}
       <SubmitButton>Salvar plano</SubmitButton>
     </form>
   );

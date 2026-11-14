@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { listUsers } from "@/domains/users/service";
 import { canManageUsers } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { fmtDateTimeFull } from "@/lib/format";
 import { NewUserForm, RowActions } from "./form";
+
+
+export const metadata: Metadata = { title: "Usuários" };
 
 const ROLE_LABEL: Record<string, string> = { admin: "Administração", direcao: "Direção", mentor: "Mentor", mentorado: "Mentorado" };
 

@@ -28,10 +28,10 @@ export function NewTicketForm({ mentees, defaultArea, pagePath }: { mentees: { i
         {Object.entries(TICKET_KINDS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
       </select>
       <label htmlFor="title">Assunto (resumo em uma frase)</label>
-      <input id="title" name="title" maxLength={160} required placeholder="Ex.: não consigo marcar o portão da ficha de 1 página" />
+      <input id="title" name="title" maxLength={160} required placeholder="Ex.: não consigo marcar o item da ficha de 1 página" />
       <label htmlFor="description">Detalhes</label>
       <textarea id="description" name="description" rows={6} maxLength={4000} placeholder="O que você tentou fazer, o que apareceu na tela…" />
-      {state?.error && <div className="msg err">{state.error}</div>}
+      {state?.error && <div role="alert" className="msg err">{state.error}</div>}
       <SubmitButton pendingLabel="Enviando…">Enviar chamado</SubmitButton>
     </form>
   );
@@ -48,8 +48,8 @@ export function ReplyForm({ ticketId, staff }: { ticketId: string; staff: boolea
           <input type="checkbox" name="internal" style={{ width: "auto" }} /> Nota interna (o mentorado não vê)
         </label>
       )}
-      {state?.error && <div className="msg err">{state.error}</div>}
-      {state?.ok && <div className="msg ok">{state.ok}</div>}
+      {state?.error && <div role="alert" className="msg err">{state.error}</div>}
+      {state?.ok && <div role="status" className="msg ok">{state.ok}</div>}
       <SubmitButton pendingLabel="Enviando…">Enviar</SubmitButton>
     </form>
   );
@@ -61,8 +61,8 @@ export function ResolveForm({ ticketId }: { ticketId: string }) {
     <form autoComplete="off" action={action}>
       <label htmlFor="solution">Solução / resposta final (o mentorado vê e fica no painel de soluções)</label>
       <textarea id="solution" name="solution" rows={4} maxLength={4000} required />
-      {state?.error && <div className="msg err">{state.error}</div>}
-      {state?.ok && <div className="msg ok">{state.ok}</div>}
+      {state?.error && <div role="alert" className="msg err">{state.error}</div>}
+      {state?.ok && <div role="status" className="msg ok">{state.ok}</div>}
       <SubmitButton pendingLabel="Resolvendo…">Marcar como resolvido</SubmitButton>
     </form>
   );
@@ -76,7 +76,7 @@ export function TicketButtons({ ticketId, status, staff }: { ticketId: string; s
     <div className="row">
       {staff && status !== "resolvido" && <button className="btn sec" disabled={pending} onClick={() => run(() => assumeAction(ticketId))}>{pending ? "Aguarde…" : "Assumir chamado"}</button>}
       {status === "resolvido" && <button className="btn sec" disabled={pending} onClick={() => run(() => reopenAction(ticketId))}>{pending ? "Aguarde…" : "Reabrir"}</button>}
-      {err && <span className="msg err">{err}</span>}
+      {err && <span role="alert" className="msg err">{err}</span>}
     </div>
   );
 }

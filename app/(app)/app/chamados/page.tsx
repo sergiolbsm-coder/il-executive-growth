@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { listTickets, supportPanel } from "@/domains/support/service";
 import { isStaff } from "@/lib/authorization";
 import { requireUser, toContext } from "@/lib/auth/session";
 import { fmtDateTimeFull } from "@/lib/format";
 import { TICKET_AREAS, TICKET_KINDS, TICKET_STATUS, type TicketArea, type TicketStatus } from "@/lib/support";
+
+
+export const metadata: Metadata = { title: "Chamados e dúvidas" };
 
 const STATUSES = Object.keys(TICKET_STATUS) as TicketStatus[];
 

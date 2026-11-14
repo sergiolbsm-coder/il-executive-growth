@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { logoutAction } from "@/app/actions";
+import { Icon } from "@/components/Icon";
 import type { NavItem } from "@/lib/nav";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -23,9 +24,9 @@ export function Sidebar({ items, user }: { items: NavItem[]; user: { name: strin
 
   return (
     <>
-      <button className="sidebar-toggle" aria-label="Abrir menu" onClick={() => setOpen(true)}>☰</button>
-      {open && <div className="sidebar-overlay" onClick={() => setOpen(false)} />}
-      <aside className={`sidebar${open ? " open" : ""}`}>
+      <button className="sidebar-toggle" aria-label="Abrir menu" aria-expanded={open} onClick={() => setOpen(true)}><Icon name="menu" size={20} /></button>
+      {open && <div className="sidebar-overlay" onClick={() => setOpen(false)} aria-hidden="true" />}
+      <aside className={`sidebar${open ? " open" : ""}`} aria-label="Menu principal">
         <div className="sidebar-brand">
           <div className="logo-wrap">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -41,20 +42,12 @@ export function Sidebar({ items, user }: { items: NavItem[]; user: { name: strin
             return (
               <div key={g ?? "main"} className="nav-group">
                 {g && <div className="nav-group-title">{g}</div>}
-                {list.map((i) =>
-                  i.status === "soon" ? (
-                    <span key={i.href + i.label} className="nav-btn disabled" aria-disabled="true" title="Em breve">
-                      <span className="nav-icon">{i.icon}</span>
-                      <span>{i.label}</span>
-                      <span className="nav-soon">em breve</span>
-                    </span>
-                  ) : (
-                    <Link key={i.href + i.label} href={i.href} className={`nav-btn${isActive(i.href) ? " active" : ""}`}>
-                      <span className="nav-icon">{i.icon}</span>
-                      <span>{i.label}</span>
-                    </Link>
-                  ),
-                )}
+                {list.map((i) => (
+                  <Link key={i.href + i.label} href={i.href} className={`nav-btn${isActive(i.href) ? " active" : ""}`} aria-current={isActive(i.href) ? "page" : undefined}>
+                    <span className="nav-icon"><Icon name={i.icon} /></span>
+                    <span>{i.label}</span>
+                  </Link>
+                ))}
               </div>
             );
           })}
@@ -67,7 +60,7 @@ export function Sidebar({ items, user }: { items: NavItem[]; user: { name: strin
             <span className="user-role">{ROLE_LABEL[user.role] ?? user.role}</span>
           </span>
           <form autoComplete="off" action={logoutAction}>
-            <button className="user-exit" title="Sair" aria-label="Sair">🚪</button>
+            <button className="user-exit" title="Sair" aria-label="Sair"><Icon name="logout" /></button>
           </form>
         </div>
         <Link href="/trocar-senha" className="nav-link-small">Alterar senha</Link>
